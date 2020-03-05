@@ -1,312 +1,161 @@
-from affe import __version__
-
-__author__ = "Elia vw"
-__copyright__ = "Elia vw"
-__license__ = "mit"
-
 import os
 from os.path import dirname
+from functools import partial
+from .utils import flatten_dict
 
-
+# Suggested Defaults
 SEPARATOR = "-"
 LABELS = dict(query="q", exp="e", fold="f", experiment="e")
+DEFAULT_CHILDREN = dict(
+    root=["cli", "data", "out", "scripts"],
+    out=["manual", "preprocessing", "fit", "predict"],
+    model=["models", "logs", "timings"],
+    exp=["config", "logs", "results", "timings", "tmp"],
+)
 
-# Generate a standard filesystem. Only in exceptional cases you deviate.
-def build_filesystem(root=None, levels_up=2):
-    """
-    root
-    |---config
-    |   |---query
-    |   |---model
-    |
-    |---out
-        |---$SCRIPT
-        |---run_mercs
-        |---run_pxs
-            |---exp-0001
-                |---logs
-                |---timings
-                |---results
-                |---config   
-    |
-    |---data
-        |---raw
-            |---datasets-UCI
-            |---datasets-starai
-                |---datasets
-        |---step-01
-        |---step-02
-    |---cli
-        |---main
-        |---predict
-        |---fit
-        |---cli-config
-    _
-    """
 
-    fs = {}
+def _default_root(levels_up=2):
+    root = os.getcwd()
+    for _ in range(levels_up):
+        root = dirname(root)
+    return root
 
+
+def _directory(root=None, children=None, root_levels_up=0):
     if root is None:
-        root = os.getcwd()
-        for _ in range(levels_up):
-            root = dirname(root)
-        fs["root"] = root
-    else:
-        fs["root"] = root
+        root = _default_root(levels_up=root_levels_up)
 
-    # Level 01
-    level_01 = _default_subdirectories_root_directory()
-    for l in level_01:
-        fs[l] = [l]
+    directory = dict(root=root)
+    if children is not None:
+        parent = "root"
 
-    # Abs
-    def abspath(v):
-        if v == "root":
-            return fs.get("root")
-        elif isinstance(v, list):
-            return os.path.join(fs.get("root"), *v)
-        elif v in fs.keys():
-            return os.path.join(fs.get("root"), *fs.get(v))
-
-    fs["abspath"] = abspath
-
-    return fs
-
-
-def _default_subdirectories_root_directory():
-    return ["config", "data", "out", "cli", "models", "scripts"]
-
-
-def _default_subdirectories_exp_directory():
-    return ["results", "timings", "logs", "config", "tmp"]
-
-
-FILESYSTEM = build_filesystem()
-
-
-# -------- -------- -------- --------
-# LEGACY
-# -------- -------- -------- --------
-def exp_directory(exp_dname="default", script="manual", fs=None):
-    """
-    Standard output directory for an experiment.
-    """
-    directory = {}
-
-    # Root-level
-    out_dir = FILESYSTEM["out"] if fs is None else fs["out"]
-
-    directory["script"] = os.path.join(out_dir, script)
-    directory["current_exp"] = os.path.join(directory["script"], exp_dname)
-
-    # Subdirectories
-    directory["results"] = os.path.join(directory["current_exp"], "results")
-    directory["timings"] = os.path.join(directory["current_exp"], "timings")
-    directory["logs"] = os.path.join(directory["current_exp"], "logs")
-    directory["config"] = os.path.join(directory["current_exp"], "config")
-    directory["tmp"] = os.path.join(directory["current_exp"], "tmp")
+        s = {child: parent for child in children}
+        directory = {**directory, **s}
     return directory
 
 
-# Filename functions
-def original_filename(
-    basename, extension="arff", category="UCI", train_or_test="train", fs=None
-):
+def tree_path(tree, node, separator=None):
+    tree_path = []
+    while tree.get(node, False):
+        tree_path.insert(0, node)
+        node = tree.get(node)  # Go to parent node
 
-    raw_dir = FILESYSTEM["raw"] if fs is None else fs["raw"]
+    if separator is not None:
+        first_one = tree_path[0] # Root stays root.
+        tree_path = [n.split(separator).pop() for n in tree_path]
+        tree_path[0] = first_one
+    return tree_path
 
-    if category in {"UCI", "uci"}:
-        dn = FILESYSTEM["datasets-UCI"] if fs is None else fs["datasets-UCI"]
 
-        true_path = os.path.join(dn, "{}.{}".format(basename, extension))
-    elif category in {"starai"}:
-        dn = FILESYSTEM["datasets-starai"] if fs is None else fs["datasets-starai"]
-        true_path = os.path.join(
-            dn,
-            "{}".format(basename),
-            "{}.{}.{}".format(basename, train_or_test, extension),
-        )
+def _rename_directory(directory, source="root", target="rootroot"):
+
+    directory = directory.copy()
+
+    # 1. Replace the entry of source
+    src_tmp = directory.pop(source)
+    directory[target] = src_tmp
+
+    # 2. Replace everything that has source as parent
+    directory = {k: v if v != source else target for k, v in directory.items()}
+
+    return directory
+
+
+def _alter_root_value(tree, value):
+    tree = tree.copy()
+    root = _get_root_node(tree)
+    tree[root] = value
+    return tree
+
+
+def _get_root_node(tree):
+    return [node for node in tree if tree.get(node) not in tree].pop()
+
+
+def abspath(tree, node, filename=None, separator="."):
+    tp = tree_path(tree, node, separator=separator)
+    if filename is not None:
+        tp.append(filename)
+
+    root_node = tp.pop(0)
+    root_dir = tree.get(root_node)
+    if len(tp) > 0:
+        return os.path.join(root_dir, *tp)
     else:
-        raise ValueError("Did not recognize category: {}".format(category))
-
-    return true_path
+        return root_dir
 
 
-def filename_dataset(
-    basename,
-    step=1,
-    prefix="",
-    suffix="",
-    separator="-",
-    extension="arff",
-    check=True,
-    fs=None,
+def _insert_child_directory_in_parent_directory(
+    child_dir, parent_dir, anchor="root",
 ):
-    """
-    Filename generator for the datafiles of this experiment
-    """
+    if anchor is not None:
+        # check nameclashes
+        assert len(set(child_dir.keys()) & set(parent_dir.keys())) == 0
+        child_dir = _alter_root_value(child_dir, anchor)
+        return {**child_dir, **parent_dir}
+    else:
+        # Assumption: child dir has as its root a directory that is represented in the parent dir
+        child_root = _get_root_node(child_dir)
+        assert child_root in parent_dir
+        child_dir.pop(child_root)
 
-    # Directory name
-    data_dir = FILESYSTEM["data"] if fs is None else fs["datal"]
-    step_dir = build_directory_name(
-        parent=data_dir, basename="step", idx=step, zeroes=2
-    )
-
-    # File name
-    filename = build_filename(
-        basename, prefix=prefix, suffix=suffix, separator=separator, extension=extension
-    )
-
-    return _check_and_join(filename, step_dir, check=check)
-
-
-def filename_model(
-    basename,
-    prefix="",
-    suffix="default",
-    separator="-",
-    extension="pkl",
-    check=True,
-    fs=None,
-):
-    """
-    Filename generator of the models of this experiment
-    """
-    # Directory name
-    mod_dir = FILESYSTEM["model"] if fs is None else fs["model"]
-
-    # File name
-    filename = build_filename(
-        basename, prefix=prefix, suffix=suffix, separator=separator, extension=extension
-    )
-
-    return _check_and_join(filename, mod_dir, check=check)
+        # check nameclashes
+        assert len(set(child_dir.keys()) & set(parent_dir.keys())) == 0
+        return {
+            **parent_dir,
+            **child_dir,
+        }
 
 
-def filename_query(
-    basename,
-    prefix="",
-    suffix="default",
-    separator="-",
-    extension="npy",
-    check=True,
-    fs=None,
-):
-    """
-    Filename generator of the query files of this experiment
-    """
-    # Directory name
-    qry_dir = FILESYSTEM["query"] if fs is None else fs["query"]
+def get_code_string(idx=0, kind=None, n_zeroes=4, separator=SEPARATOR, labels=LABELS):
 
-    # File name
-    filename = build_filename(
-        basename, prefix=prefix, suffix=suffix, separator=separator, extension=extension
-    )
+    index_string = "{}".format(idx).zfill(n_zeroes)
+    label_string = labels.get(kind, None)
 
-    return _check_and_join(filename, qry_dir, check=check)
+    if label_string is None:
+        return index_string
+    else:
+        return "{}{}{}".format(label_string, separator, index_string)
 
 
-def filename_cli_commands(
-    exp_keyword,
-    prefix="",
-    suffix="",
-    separator="-",
-    extension="csv",
-    check=True,
-    fs=None,
-):
-    # Directory name
-    cli_config_dir = FILESYSTEM["cli-config"] if fs is None else fs["cli-config"]
-
-    # File name
-    filename = build_filename(
-        basename=exp_keyword,
-        prefix=prefix,
-        suffix=suffix,
-        separator=separator,
-        extension=extension,
-    )
-
-    return _check_and_join(filename, cli_config_dir, check=check)
-
-
-def filename_nodefile(
-    basename="nodefile", check=True, fs=None,
-):
-    # Directory name
-    cli_dir = FILESYSTEM["cli"] if fs is None else fs["cli"]
-
-    # File name
-    filename = build_filename(
-        basename=basename, prefix="", suffix="", separator="", extension="",
-    )
-
-    return _check_and_join(filename, cli_dir, check=check)
-
-
-def filename_script(script, fs=None, extension="py", kind="fit", check=True):
-    # Directory name
-    dirname = FILESYSTEM[kind] if fs is None else fs[kind]
-    filename = build_filename(script, extension=extension)
-    return _check_and_join(filename, dirname, check=check, check_file=True)
-
-
-def filename_results(**kwargs):
-    return _filename_generic_output(kind="results", **kwargs)
-
-
-def filename_logs(**kwargs):
-    return _filename_generic_output(kind="logs", **kwargs)
-
-
-def filename_timings(**kwargs):
-    return _filename_generic_output(kind="timings", **kwargs)
-
-
-def filename_config(**kwargs):
-    return _filename_generic_output(kind="config", **kwargs)
-
-
-def _filename_generic_output(
-    kind="results",
-    exp_fname=None,
-    exp_dname=None,
-    prefix="",
-    suffix="",
-    script=None,
-    separator=SEPARATOR,
-    extension="csv",
-    check=True,
-    fs=None,
-):
-    # Directory name
-    directory_name = exp_directory(exp_dname=exp_dname, script=script, fs=fs).get(
-        kind, False
-    )
-    assert directory_name
-
-    # File name
-    filename = build_filename(
-        basename=exp_fname,
-        prefix=prefix,
-        suffix=suffix,
-        separator=separator,
-        extension=extension,
-    )
-
-    return _check_and_join(filename, directory_name, check=check)
-
-
-# General functions
-def build_filename(
+def get_filepath(
     basename="",
     prefix="",
     suffix="",
-    separator=SEPARATOR,
     extension="csv",
-    **code_string_kwargs
+    separator=SEPARATOR,
+    tree=None,
+    node=None,
+    check_directory=True,
+    check_file=False,
+    **code_string_kwargs,
 ):
+    filename = get_filename(
+        basename=basename,
+        prefix=prefix,
+        suffix=suffix,
+        extension=extension,
+        separator=separator,
+        **code_string_kwargs,
+    )
 
+    filepath = abspath(tree, node, filename=filename)
+
+    # Ensure existence of the directory, we do not care about overwriting a file.
+    assert _check(filepath, check_directory=check_directory, check_file=check_file)
+
+    return filepath
+
+
+def get_filename(
+    basename="",
+    prefix="",
+    suffix="",
+    extension="csv",
+    separator=SEPARATOR,
+    **code_string_kwargs,
+):
+    # Preprocess filename parts
     if isinstance(basename, list):
         basename = separator.join(basename)
 
@@ -316,125 +165,116 @@ def build_filename(
     if isinstance(suffix, list):
         suffix = separator.join(suffix)
 
+    # Generate code string if necessary (always assumed as last thing)
     if code_string_kwargs:
-        code_string = build_code_string(**code_string_kwargs)
+        code_string = get_code_string(**code_string_kwargs)
     else:
         code_string = ""
 
+    # Join parts for full filename
     base = separator.join(
         [x for x in (prefix, basename, code_string, suffix) if len(x) > 0]
     )
 
+    # Add extension if necessary
     if len(extension) > 0:
         return base + ".{}".format(extension)
     else:
         return base
 
 
-def build_code_string(idx=0, kind=None, zeroes=4):
-
-    index_string = "{}".format(idx).zfill(zeroes)
-    label_string = LABELS.get(kind, None)
-
-    if label_string is None:
-        return index_string
-    else:
-        return "{}{}{}".format(label_string, SEPARATOR, index_string)
-
-
-def build_directory_name(
-    parent=None, basename=None, separator=SEPARATOR, **code_string_kwargs
-):
-
-    code_string = build_code_string(**code_string_kwargs)
-
-    if basename is not None:
-        dirname = "{}{}{}".format(basename, separator, code_string)
-    else:
-        dirname = code_string
-
-    if parent is None:
-        return dirname
-    else:
-        return os.path.join(parent, dirname)
-
-
-def _check_and_join(filename, directory, check=True, check_file=False):
-    # If dir does not exist, make it
-    if check:
+def _check(filename, check_directory=True, check_file=False):
+    # If directory does not exist: make it
+    directory = os.path.dirname(filename)
+    if check_directory:
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-    fname = os.path.join(directory, filename)
+    # If file already exists: complain
     if check_file:
-        assert os.path.isfile(fname)
-    return fname
+        assert os.path.isfile(filename)
+    return True
 
 
-# Etc
-def default_prefix_exp_fn_suffix(
-    config,
-    predict_config=None,
-    fit_config=None,
-    exp_idx=None,
-    qry_idx=None,
-    exp_fn_fields=None,
+def mimic_fs(
+    root=None, root_levels_up=2, exclude=None, depth=1, flatten=True, rename_root=None
 ):
+    if root is None:
+        root = _default_root(levels_up=root_levels_up)
 
-    if exp_idx is None:
-        exp_idx = config.get("exp_idx", 0)
-    else:
-        assert exp_idx == config.get("exp_idx")
+    if exclude is None:
+        exclude = {"note", "src", "docs", "tests", "visualisation"}
 
-    p = experiment_prefix(exp_idx)
-    s = experiment_suffix(qry_idx)
+    tree = mimic_directory(root, exclude_children=exclude)
 
-    if predict_config is not None:
-        f = experiment_filename(
-            config, predict_config, kind="predict", fields=exp_fn_fields
-        )
-    elif fit_config is not None:
-        f = experiment_filename(config, fit_config, kind="fit", fields=exp_fn_fields)
-    else:
-        raise NotImplementedError("No idea what to do.")
+    if rename_root is not None:
+        tree = _rename_directory(tree, source="root", target=rename_root)
 
-    return p, f, s
+    if depth > 0:
+        do_not_expand = {"root", rename_root}
 
+        for node, value in tree.items():
+            if node not in do_not_expand:
 
-def experiment_filename(
-    config, predict_config=None, fit_config=None, kind="fit", fields=None
-):
+                if rename_root is not None:
+                    next_root = "{}.{}".format(rename_root, node)
+                else:
+                    next_root = node
 
-    exp_fn = [config.get("dataset")]
+                subdir = abspath(tree, node)
+                subtree = mimic_fs(
+                    root=subdir,
+                    exclude=exclude,
+                    depth=depth - 1,
+                    flatten=False,
+                    rename_root=next_root,
+                )
+                subtree.pop(next_root)
+                if len(subtree) > 0:
+                    tree[node] = subtree
+                    tree = flatten_dict(tree)
+                    tree[node] = value
+                do_not_expand.add(node)
 
-    if kind in {"fit"}:
-        if fields is not None:
-            exp_fn = exp_fn + [fit_config.get(f) for f in fields]
-        return exp_fn
-    elif kind in {"predict"}:
-        if fields is not None:
-            exp_fn = exp_fn + [predict_config.get(f) for f in fields]
-        return exp_fn
-    else:
-        raise NotImplementedError("No idea what convention to follow.")
-
-
-def experiment_prefix(exp_idx):
-    return build_code_string(idx=exp_idx, kind=None)
+    return tree
 
 
-def experiment_suffix(qry_idx):
+def mimic_directory(directory_path, exclude_children=None):
+    if exclude_children is None:
+        exclude_children = {"note", "src", "docs", "tests"}
 
-    if qry_idx is None:
-        return ""
-    elif isinstance(qry_idx, int):
-        return build_code_string(idx=qry_idx, kind="query")
-    elif isinstance(qry_idx, list):
-        if len(qry_idx) > 1:
-            suffix_one = build_code_string(idx=qry_idx[0], kind="query")
-            suffix_two = build_code_string(idx=qry_idx[-1], kind="query")
-            suffix = [suffix_one, suffix_two]
-        else:
-            suffix = build_code_string(idx=qry_idx[0], kind="query")
-        return suffix
+    children = [
+        d
+        for d in os.listdir(directory_path)
+        if os.path.isdir(os.path.join(directory_path, d))  # Has to be a directory
+        if not d.startswith(".")  # Exclude hidden dirs
+        if not d.startswith("_")  # Exclude hidden dirs
+        if d not in exclude_children
+    ]
+
+    tree = _directory(root=directory_path, children=children)
+
+    return tree
+
+
+# Interesting Suggested Defaults
+DEFAULT_NAMING_CONVENTION = dict(
+    model=partial(get_filepath, suffix="default", extension="pkl", node="model"),
+    query=partial(get_filepath, suffix="default", extension="npy", node="query"),
+    timings=partial(get_filepath, basename="timings", extension="csv", node="timings"),
+    results=partial(get_filepath, basename="results", extension="csv", node="results"),
+    logs=partial(get_filepath, basename="logs", extension="", node="logs"),
+)
+
+
+def get_root_directory(root=None, children=None, root_levels_up=2):
+    if children is None:
+        children = DEFAULT_CHILDREN["root"]
+    return _directory(root=root, children=children, root_levels_up=root_levels_up)
+
+
+def get_exp_directory(root=None, children=None, root_levels_up=2):
+    if children is None:
+        children = DEFAULT_CHILDREN["exp"]
+    return _directory(root=root, children=children, root_levels_up=root_levels_up)
 
