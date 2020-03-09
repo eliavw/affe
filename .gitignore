@@ -1,3 +1,9 @@
+# output files
+out/*
+
+# Binaries
+*.pkl
+
 # Notebooks
 .ipynb_checkpoints
 */ipynb_checkpoints/*
