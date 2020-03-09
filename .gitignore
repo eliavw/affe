@@ -3,6 +3,8 @@
 */ipynb_checkpoints/*
 
 # IDE
+.vscode
+.vscode/*
 .idea
 */.idea/*
 
