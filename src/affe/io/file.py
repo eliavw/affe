@@ -100,6 +100,7 @@ FN_TEMPLATE_CLASSIC_FLOW = dict(
     results=partial(get_filepath, extension="pkl", node="results"),
     config=partial(get_filepath, extension="json", node="config"),
     logs=partial(get_filepath, extension="", node="logs"),
+    flows=partial(get_filepath, extension="pkl", node="flows"),
 )
 
 def get_template_filenames(

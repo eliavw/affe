@@ -1,6 +1,6 @@
 [SETTINGS] {
-  "date": "2020/03/09 01:02:37",
-  "date_iso": "2020-03-09T01:02:37.989781",
+  "date": "2020/03/09 01:55:36",
+  "date_iso": "2020-03-09T01:55:36.706392",
   "params": null,
   "system": {
     "nodename": "belafonte",
@@ -11,41 +11,41 @@
     "system": "Linux",
     "cpu_count": 4,
     "cpu_times": {
-      "user": 7381.94,
-      "system": 2207.91,
-      "idle": 84936.49,
-      "nice": 1.83
+      "user": 8456.86,
+      "system": 2537.34,
+      "idle": 96105.78,
+      "nice": 1.9
     },
-    "cpu_percent": 20.7,
+    "cpu_percent": 16.5,
     "virtual_memory": {
       "total": 8242700288,
-      "available": 3335655424,
-      "percent": 59.5,
-      "used": 3983917056,
-      "free": 1195958272
+      "available": 3791486976,
+      "percent": 54.0,
+      "used": 3595337728,
+      "free": 1569038336
     }
   },
   "process": {
     "username": "zissou",
     "cwd": "/home/zissou/repos/affe/note/impl",
-    "create_time": 1583712154.42,
+    "create_time": 1583715333.17,
     "cpu_times": {
-      "user": 1.01,
-      "system": 0.09
+      "user": 0.96,
+      "system": 0.1
     }
   },
   "logfile": "/home/zissou/repos/affe/out/flow/logs/logfile",
   "max_time": 10.0,
   "function": {
-    "target": "functools.partial(<function dummy_flow at 0x7fa074074280>, {'io': {'fs': {'root': '/home/zissou/repos/affe', 'cli': 'root', 'data': 'root', 'out': 'root', 'scripts': 'root', 'out.flow.config': 'out.flow', 'out.flow.logs': 'out.flow', 'out.flow.results': 'out.flow', 'out.flow.timings': 'out.flow', 'out.flow.tmp': 'out.flow', 'out.flow': 'out'}}})",
+    "target": "functools.partial(<function dummy_flow at 0x7f4a3b40d5e0>, {'io': {'fs': {'root': '/home/zissou/repos/affe', 'cli': 'root', 'data': 'root', 'out': 'root', 'scripts': 'root', 'out.flow.config': 'out.flow', 'out.flow.logs': 'out.flow', 'out.flow.results': 'out.flow', 'out.flow.timings': 'out.flow', 'out.flow.tmp': 'out.flow', 'out.flow': 'out'}}})",
     "args": []
   }
 }
 [INFO] Start: Run process
 [INFO] Write log to /home/zissou/repos/affe/out/flow/logs/logfile.running.log
-[INFO] Start multiprocess (16164)
+[INFO] Start multiprocess (19382)
 Hello world
 2 secs passed
 [INFO] Process ended (returncode 0)
-[INFO] Finished: Run process 2.210 seconds
-[WARNING] Exit:finished; Returncode:0; Time:2.20985
+[INFO] Finished: Run process 2.211 seconds
+[WARNING] Exit:finished; Returncode:0; Time:2.21127

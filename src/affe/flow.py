@@ -39,7 +39,7 @@ class Flow:
         flow=None,
         imports=None,
         log_filepath="logfile",
-        flow_filepath="flowfile.pkl",
+        flow_filepath=None,
         timeout_s=60,
     ):
         self.log_filepath = log_filepath
@@ -80,10 +80,11 @@ class Flow:
         time.sleep(1)
         return r
 
-    def run_via_shell(self, executable=None, cwd=None, ensure_dump=False):
+    def run_via_shell_with_log(self, executable=None, cwd=None, ensure_dump=False):
         if not self.dumped or ensure_dump:
             # If you have not dumped yourself, you cannot run yourself as a script.
             self.dump()
+        assert self.dumped, "If you have not dumped yourself, you cannot go through a shell."
 
         if cwd is None:
             cwd = os.getcwd()
@@ -113,12 +114,37 @@ class Flow:
 
         return get_flow_cli(abs=abs)
 
-    def get_cli_command(self, executable="python", return_list=True):
+    def get_logged_cli(self, abs=True):
+        from affe.cli import get_flow_cli_with_monitors
+
+        return get_flow_cli_with_monitors(abs=abs)
+
+    def get_cli_command(self, executable=None, cli=None, return_list=True):
+        if executable is None:
+            executable = sys.executable
+
+        if cli is None:
+            cli = self.get_default_cli()
+
         cmd = []
         cmd.append(executable)
-        cmd.append(self.get_default_cli())
+        cmd.append(cli)
         cmd.append("-f")
         cmd.append(self.flow_filepath)
+        if return_list:
+            return cmd
+        else:
+            return " ".join(cmd)
+
+    def get_cli_command_with_logs(self, executable=None, return_list=True):
+
+        cli = self.get_logged_cli()
+
+        cmd = self.get_cli_command(executable=executable, cli=cli)
+        cmd.append("-l")
+        cmd.append(self.log_filepath)
+        cmd.append("-t")
+        cmd.append(str(self.timeout_s))
         if return_list:
             return cmd
         else:

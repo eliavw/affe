@@ -1,6 +1,6 @@
 [SETTINGS] {
-  "date": "2020/03/09 01:09:05",
-  "date_iso": "2020-03-09T01:09:05.834689",
+  "date": "2020/03/09 02:03:40",
+  "date_iso": "2020-03-09T02:03:40.914467",
   "params": null,
   "system": {
     "nodename": "belafonte",
@@ -11,27 +11,27 @@
     "system": "Linux",
     "cpu_count": 4,
     "cpu_times": {
-      "user": 7538.82,
-      "system": 2249.62,
-      "idle": 86273.9,
-      "nice": 1.83
+      "user": 8653.04,
+      "system": 2589.26,
+      "idle": 97769.51,
+      "nice": 8.2
     },
-    "cpu_percent": 11.8,
+    "cpu_percent": 35.7,
     "virtual_memory": {
       "total": 8242700288,
-      "available": 3187441664,
-      "percent": 61.3,
-      "used": 4123578368,
-      "free": 1043091456
+      "available": 3517136896,
+      "percent": 57.3,
+      "used": 3827388416,
+      "free": 990400512
     }
   },
   "process": {
     "username": "zissou",
     "cwd": "/home/zissou/repos/affe/note/impl",
-    "create_time": 1583712531.24,
+    "create_time": 1583715820.05,
     "cpu_times": {
-      "user": 1.28,
-      "system": 0.15
+      "user": 0.41,
+      "system": 0.05
     }
   },
   "logfile": "/home/zissou/repos/affe/out/flow/logs/logfile-with-script",
@@ -49,5 +49,5 @@ Hello world
     
 
 [INFO] Process ended (returncode 0)
-[INFO] Finished: Run process 2.609 seconds
-[WARNING] Exit:finished; Returncode:0; Time:2.60869
+[INFO] Finished: Run process 2.605 seconds
+[WARNING] Exit:finished; Returncode:0; Time:2.60494

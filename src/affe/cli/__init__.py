@@ -1,1 +1,2 @@
 from .flow_cli import get_flow_cli
+from .flow_cli_with_monitors import get_flow_cli_with_monitors
