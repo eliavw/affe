@@ -1,5 +1,6 @@
 import argparse
 import os
+from functools import partial
 
 
 def get_flow_cli_with_monitors(abs=True):
@@ -17,19 +18,26 @@ def main(flow_filepath, log_filepath, timeout_s=60, verbosity=1):
     from affe.flow import load_flow
     from affe.utils import debug_print
     from affe.executors import get_monitors
-    from affe.dtaiexperimenter import Process
+    from affe.dtaiexperimenter import Process, Function
 
-    flow = load_flow(flow_filepath)
-    cmd = flow.get_cli_command(executable=None) # You are not going to let this script CHANGE the executable!
+    f = load_flow(flow_filepath)
+    cmd = f.get_cli_command(
+        executable=None
+    )  # You are not going to let this script CHANGE the executable!
     monitors = get_monitors(log_filepath, timeout_s)
 
     cwd = os.getcwd()
-    p = Process(cmd, monitors=monitors, cwd=cwd)  # Init Process
+    executor = Process(cmd, monitors=monitors, cwd=cwd)  # Init Process
+
+    # flow_initialized = partial(f.flow, f.config)
+    # executor = Function(flow_initialized, monitors=monitors)
+
     msg = """
     Done running the general-purpose monitored flow script.
     """
     debug_print(msg, level=1, v=verbosity)
-    return p.run()
+    return executor.run()
+
 
 # CLI
 def create_parser():
@@ -76,4 +84,8 @@ if __name__ == "__main__":
     log_filepath_outer_scope = args.log_filepath
     timeout_s_outer_scope = args.timeout_s
 
-    main(flow_filepath_outer_scope, log_filepath_outer_scope, timeout_s=timeout_s_outer_scope)
+    main(
+        flow_filepath_outer_scope,
+        log_filepath_outer_scope,
+        timeout_s=timeout_s_outer_scope,
+    )
