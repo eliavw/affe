@@ -13,3 +13,4 @@ dependencies:
       - semantic-version
       - mkdocs-minify-plugin
       - pymdown-extensions
+      - nb-black

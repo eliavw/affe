@@ -6,7 +6,8 @@ try:
     dist_name = __name__
     __version__ = get_distribution(dist_name).version
 
-    from . import io, utils
+    from . import io, utils, executors, cli
+
 
 except DistributionNotFound:
     __version__ = "unknown"

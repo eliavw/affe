@@ -1,0 +1,53 @@
+[SETTINGS] {
+  "date": "2020/03/09 01:09:05",
+  "date_iso": "2020-03-09T01:09:05.834689",
+  "params": null,
+  "system": {
+    "nodename": "belafonte",
+    "machine": "x86_64",
+    "platform": "Linux-5.3.0-40-generic-x86_64-with-glibc2.10",
+    "processor": "x86_64",
+    "version": "#32~18.04.1-Ubuntu SMP Mon Feb 3 14:05:59 UTC 2020",
+    "system": "Linux",
+    "cpu_count": 4,
+    "cpu_times": {
+      "user": 7538.82,
+      "system": 2249.62,
+      "idle": 86273.9,
+      "nice": 1.83
+    },
+    "cpu_percent": 11.8,
+    "virtual_memory": {
+      "total": 8242700288,
+      "available": 3187441664,
+      "percent": 61.3,
+      "used": 4123578368,
+      "free": 1043091456
+    }
+  },
+  "process": {
+    "username": "zissou",
+    "cwd": "/home/zissou/repos/affe/note/impl",
+    "create_time": 1583712531.24,
+    "cpu_times": {
+      "user": 1.28,
+      "system": 0.15
+    }
+  },
+  "logfile": "/home/zissou/repos/affe/out/flow/logs/logfile-with-script",
+  "max_time": 10.0,
+  "command": "/home/zissou/miniconda3/envs/affe/bin/python /home/zissou/repos/affe/src/affe/cli/flow_cli.py -f yolo.pkl"
+}
+[INFO] cmd:/home/zissou/miniconda3/envs/affe/bin/python /home/zissou/repos/affe/src/affe/cli/flow_cli.py -f yolo.pkl; cwd:/home/zissou/repos/affe/note/impl
+[INFO] Start: Run process
+[INFO] Write log to /home/zissou/repos/affe/out/flow/logs/logfile-with-script.running.log
+Imports succesful.
+Hello world
+2 secs passed
+
+    I am running the general-purpose flow script.
+    
+
+[INFO] Process ended (returncode 0)
+[INFO] Finished: Run process 2.609 seconds
+[WARNING] Exit:finished; Returncode:0; Time:2.60869
