@@ -3,52 +3,18 @@ import os
 import sys
 import time
 from functools import partial
-import dill
 
 import dill as pkl
 
-from .dtaiexperimenter import Function, Process
-from .execs import get_monitors
-from .io import dump_object
-
-
-def load_flow(fn):
-    with open(fn, "rb") as f:
-        flow = pkl.load(f)
-    return flow
-
-
-def _find_offset_and_line_of_definition(lines):
-    for l_idx, l in enumerate(lines):
-        function_definition_offset = l.find("def ")
-        if function_definition_offset > 0:
-            break
-    return function_definition_offset, l_idx
-
-
-def extract_source_of_function(f, tabsize=4):
-    indent = " " * tabsize
-    full_source = inspect.getsource(f)
-    lines = full_source.splitlines()
-
-    function_definition_offset, l_idx = _find_offset_and_line_of_definition(lines)
-
-    inner_lines = lines[l_idx + 1 : -1]  # Drop first and last
-
-    for l_idx in range(len(inner_lines)):
-        l = inner_lines[l_idx]
-        offset = indent + " " * function_definition_offset
-        if l.startswith(offset):
-            inner_lines[l_idx] = l[len(offset) :]
-
-    inner_source = "\n".join(inner_lines)
-    return inner_source
+from ..dtaiexperimenter import Function, Process
+from ..execs import get_monitors
+from ..io import dump_object
+from .utils import extract_source_of_function
 
 
 class Flow:
-
     @classmethod
-    def load(cls,fn):
+    def load(cls, fn):
         with open(fn, "rb") as f:
             flow = pkl.load(f)
         return flow
@@ -70,7 +36,7 @@ class Flow:
         self.config = config
 
         # Manage imports
-        self.imports = imports 
+        self.imports = imports
         if self.imports is not None:
             self.imports_source_code = extract_source_of_function(self.imports)
         else:
@@ -79,7 +45,7 @@ class Flow:
         # Manage flows
         if flow is not None:
             self.flow = flow
-        
+
         if self.flow is not None:
             self.flow_source_code = extract_source_of_function(self.flow)
         else:
@@ -96,7 +62,7 @@ class Flow:
             exec(self.imports_source_code)
 
         config = self.config
-        
+
         # r = exec(self.flow_source_code)
         return self.run()
 
@@ -184,3 +150,4 @@ class Flow:
             return cmd
         else:
             return " ".join(cmd)
+

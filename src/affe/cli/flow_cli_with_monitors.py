@@ -2,6 +2,8 @@ import argparse
 import os
 from functools import partial
 
+SCRIPT_FILENAME = os.path.basename(__file__)
+
 
 def get_flow_cli_with_monitors(abs=True):
     if abs:
@@ -12,31 +14,32 @@ def get_flow_cli_with_monitors(abs=True):
 
 # MAIN
 def main(flow_filepath, log_filepath, timeout_s=60, verbosity=1):
+    msg = """
+    Start {}.
+    """.format(
+        SCRIPT_FILENAME
+    )
+    print(msg)
 
-    # Imports need to happen like this, otherwise we turn circles.
+    # Standard imports
     import affe
-    from affe.flow import load_flow
-    from affe.utils import debug_print
-    from affe.execs import get_monitors
-    from affe.dtaiexperimenter import Process, Function
+    from affe.flow import Flow
+    from affe.execs import DTAIExperimenterProcessExecutor
 
-    f = load_flow(flow_filepath)
-    cmd = f.get_cli_command(
-        executable=None
-    )  # You are not going to let this script CHANGE the executable!
-    monitors = get_monitors(log_filepath, timeout_s)
-
-    cwd = os.getcwd()
-    executor = Process(cmd, monitors=monitors, cwd=cwd)  # Init Process
-
-    # flow_initialized = partial(f.flow, f.config)
-    # executor = Function(flow_initialized, monitors=monitors)
+    # Get flow
+    flow = Flow.load(flow_filepath)
+    executor = DTAIExperimenterProcessExecutor(
+        flow, log_filepath=log_filepath, timeout_s=timeout_s
+    )
+    result = executor.run()
 
     msg = """
-    Done running the general-purpose monitored flow script.
-    """
-    debug_print(msg, level=1, v=verbosity)
-    return executor.run()
+    Done {}.
+    """.format(
+        SCRIPT_FILENAME
+    )
+    print(msg)
+    return result
 
 
 # CLI
@@ -89,3 +92,14 @@ if __name__ == "__main__":
         log_filepath_outer_scope,
         timeout_s=timeout_s_outer_scope,
     )
+
+
+# cmd = f.get_cli_command(
+#     executable=None
+# )  # You are not going to let this script CHANGE the executable!
+# monitors = get_monitors(log_filepath, timeout_s)
+
+# cwd = os.getcwd()
+# executor = Process(cmd, monitors=monitors, cwd=cwd)  # Init Process
+# flow_initialized = partial(f.flow, f.config)
+# executor = Function(flow_initialized, monitors=monitors)

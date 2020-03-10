@@ -1,6 +1,8 @@
 import argparse
 import os
 
+SCRIPT_FILENAME = os.path.basename(__file__)
+
 
 def get_flow_cli(abs=True):
     if abs:
@@ -11,23 +13,33 @@ def get_flow_cli(abs=True):
 
 # Main
 def main(flow_filepath, verbosity=1):
+    msg = """
+    Start {}.
+    """.format(
+        SCRIPT_FILENAME
+    )
+    print(msg)
 
-    # Imports need to happen like this, otherwise we turn circles.
+    # Standard imports
     import affe
-    from affe.flow import load_flow
-    from affe.utils import debug_print
+    from affe.flow import Flow
 
-    flow = load_flow(flow_filepath)
-    
-    if hasattr(flow, 'FLOW'): # SOME HACK
-        flow=flow.FLOW
+    # Get flow
+    flow = Flow.load(flow_filepath)
 
-    flow.run_with_imports()
+    # Flow prerequisites (typically custom imports)
+    if flow.imports_source_code is not None:
+        exec(flow.imports_source_code)
+
+    # Run Flow
+    flow.run()
 
     msg = """
-    I am running the general-purpose flow script.
-    """
-    debug_print(msg, level=1, v=verbosity)
+    Done {}.
+    """.format(
+        SCRIPT_FILENAME
+    )
+    print(msg)
     return
 
 
@@ -35,7 +47,7 @@ def main(flow_filepath, verbosity=1):
 def create_parser():
     # Create the parser
     parser = argparse.ArgumentParser(description="Get the flow filepath")
-    
+
     parser.add_argument(
         "-f",
         "--flow_filepath",
@@ -50,10 +62,8 @@ def create_parser():
 
 # For executable script
 if __name__ == "__main__":
-
     parser = create_parser()
     args = parser.parse_args()
 
     flow_filepath_outer_scope = args.flow_filepath
-
     main(flow_filepath_outer_scope)
