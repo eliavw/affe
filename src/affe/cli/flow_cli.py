@@ -18,8 +18,10 @@ def main(flow_filepath, verbosity=1):
     from affe.utils import debug_print
 
     flow = load_flow(flow_filepath)
-    if hasattr(flow, 'FLOW'):
+    
+    if hasattr(flow, 'FLOW'): # SOME HACK
         flow=flow.FLOW
+
     flow.run_with_imports()
 
     msg = """

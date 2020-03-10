@@ -8,7 +8,7 @@ import dill
 import dill as pkl
 
 from .dtaiexperimenter import Function, Process
-from .executors import get_monitors
+from .execs import get_monitors
 from .io import dump_object
 
 
@@ -70,8 +70,7 @@ class Flow:
         self.config = config
 
         # Manage imports
-        if imports is not None:
-            self.imports = imports
+        self.imports = imports 
         if self.imports is not None:
             self.imports_source_code = extract_source_of_function(self.imports)
         else:
@@ -80,6 +79,7 @@ class Flow:
         # Manage flows
         if flow is not None:
             self.flow = flow
+        
         if self.flow is not None:
             self.flow_source_code = extract_source_of_function(self.flow)
         else:
@@ -96,8 +96,9 @@ class Flow:
             exec(self.imports_source_code)
 
         config = self.config
-        r = exec(self.flow_source_code)
-        return r
+        
+        # r = exec(self.flow_source_code)
+        return self.run()
 
     def run_with_log(self, return_log_filepath=True):
         flow_initialized = partial(self.flow, self.config)

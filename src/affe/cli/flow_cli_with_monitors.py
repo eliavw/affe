@@ -17,7 +17,7 @@ def main(flow_filepath, log_filepath, timeout_s=60, verbosity=1):
     import affe
     from affe.flow import load_flow
     from affe.utils import debug_print
-    from affe.executors import get_monitors
+    from affe.execs import get_monitors
     from affe.dtaiexperimenter import Process, Function
 
     f = load_flow(flow_filepath)
