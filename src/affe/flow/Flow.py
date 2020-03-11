@@ -9,10 +9,37 @@ import dill as pkl
 from ..dtaiexperimenter import Function, Process
 from ..io import dump_object
 from .utils import extract_source_of_function
-from ..execs import DTAIExperimenterFunctionExecutor, DTAIExperimenterProcessExecutor
+from ..execs import DTAIExperimenterFunctionExecutor, DTAIExperimenterProcessExecutor, NativeExecutor
 
 
 class Flow:
+    """A workflow object.
+
+    A good workflow abstracts away a lot of boilerplate regarding
+        - config
+        - io
+        - execution
+
+    For the executors, we introduce the following terminology;
+        `local`:    Execute flow the current process
+        `shell`:    Execute flow in a new process
+
+        `direct`:   Stderr and stdout go as default
+        `logged`:   Stderr and stdout are collected in a logfile.
+
+        `command`:  
+    
+    Returns:
+        [type] -- [description]
+    """    
+
+    executors = dict(
+        local_now=NativeExecutor,
+        local_log=DTAIExperimenterFunctionExecutor,
+        shell_now=None,
+        shell_log=DTAIExperimenterProcessExecutor,
+    )
+
     def __init__(
         self,
         config=None,
@@ -48,18 +75,25 @@ class Flow:
         return
 
     def execute(self):
-        return self.flow(self.config)
+        e = self.executors.get('local_now')(self)
+        return e.execute()
 
     def run(self):
         return self.execute()
 
     def run_with_log(self, **kwargs):
-        e = DTAIExperimenterFunctionExecutor(self, **kwargs)
+        e = self.executors.get('local_log')(self, **kwargs)
         return e.execute()
 
-    def run_via_shell_with_log(self, **kwargs):
-        e = DTAIExperimenterProcessExecutor(self, **kwargs)
-        return e.execute()
+    def run_via_shell_with_log(self, delayed=False, return_log_filepath=True, **kwargs):
+        e = self.executors.get('shell_log')(self, delayed=delayed, **kwargs)
+        return e.execute(return_log_filepath=return_log_filepath)
+
+    def get_shell_with_log_command(self, **kwargs):
+        return self.run_via_shell_with_log(delayed=True, return_log_filepath=False, **kwargs)
+
+    def get_command(self, **kwargs):
+        return self.get_shell_with_log_command(**kwargs)
 
     @classmethod
     def load(cls, fn):

@@ -92,14 +92,3 @@ if __name__ == "__main__":
         log_filepath_outer_scope,
         timeout_s=timeout_s_outer_scope,
     )
-
-
-# cmd = f.get_cli_command(
-#     executable=None
-# )  # You are not going to let this script CHANGE the executable!
-# monitors = get_monitors(log_filepath, timeout_s)
-
-# cwd = os.getcwd()
-# executor = Process(cmd, monitors=monitors, cwd=cwd)  # Init Process
-# flow_initialized = partial(f.flow, f.config)
-# executor = Function(flow_initialized, monitors=monitors)

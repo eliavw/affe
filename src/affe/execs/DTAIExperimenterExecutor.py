@@ -169,6 +169,8 @@ class DTAIExperimenterProcessExecutor(DTAIExperimenterExecutor):
                 self.command.split(" "), monitors=self.monitors, cwd=self.cwd
             )
 
+    def get_command(self):
+        return self.command
 
 class ReturnCommand:
     def __init__(self, command="a string"):
