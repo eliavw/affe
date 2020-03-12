@@ -9,7 +9,13 @@ import dill as pkl
 from ..dtaiexperimenter import Function, Process
 from ..io import dump_object
 from .utils import extract_source_of_function
-from ..execs import DTAIExperimenterFunctionExecutor, DTAIExperimenterProcessExecutor, NativeExecutor
+from ..execs import (
+    DTAIExperimenterFunctionExecutor,
+    DTAIExperimenterProcessExecutor,
+    NativeExecutor,
+    ShellExecutor,
+    DTAIExperimenterShellExecutor
+)
 
 
 class Flow:
@@ -31,13 +37,14 @@ class Flow:
     
     Returns:
         [type] -- [description]
-    """    
+    """
 
     executors = dict(
         local_now=NativeExecutor,
+        shell_now=ShellExecutor,
         local_log=DTAIExperimenterFunctionExecutor,
-        shell_now=None,
         shell_log=DTAIExperimenterProcessExecutor,
+        shell_log_autonomous=DTAIExperimenterShellExecutor
     )
 
     def __init__(
@@ -75,25 +82,32 @@ class Flow:
         return
 
     def execute(self):
-        e = self.executors.get('local_now')(self)
+        e = self.executors.get("local_now")(self)
         return e.execute()
 
     def run(self):
         return self.execute()
 
-    def run_with_log(self, **kwargs):
-        e = self.executors.get('local_log')(self, **kwargs)
+    def run_via_shell(self, **kwargs):
+        e = self.executors.get("shell_now")(self, **kwargs)
         return e.execute()
 
-    def run_via_shell_with_log(self, delayed=False, return_log_filepath=True, **kwargs):
-        e = self.executors.get('shell_log')(self, delayed=delayed, **kwargs)
+    def run_with_log(self, **kwargs):
+        e = self.executors.get("local_log")(self, **kwargs)
+        return e.execute()
+
+    def run_with_log_via_shell(self, return_log_filepath=True, **kwargs):
+        e = self.executors.get("shell_log")(self, **kwargs)
         return e.execute(return_log_filepath=return_log_filepath)
 
-    def get_shell_with_log_command(self, **kwargs):
-        return self.run_via_shell_with_log(delayed=True, return_log_filepath=False, **kwargs)
+    def get_shell_command(self, **kwargs):
+        e = self.executors.get("shell_now")(self, **kwargs)
+        return e.command
 
-    def get_command(self, **kwargs):
-        return self.get_shell_with_log_command(**kwargs)
+    def get_shell_with_log_command(self, **kwargs):
+        # The other shell_log command goes via Process of DTAIExperimenter, this one generates a standalone bash command.
+        e = self.executors.get("shell_log_autonomous")(self, **kwargs)
+        return e.command
 
     @classmethod
     def load(cls, fn):

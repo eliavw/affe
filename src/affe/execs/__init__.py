@@ -1,2 +1,2 @@
-from .DTAIExperimenterExecutor import DTAIExperimenterFunctionExecutor, DTAIExperimenterProcessExecutor
-from .Executor import NativeExecutor
+from .DTAIExperimenterExecutor import DTAIExperimenterFunctionExecutor, DTAIExperimenterProcessExecutor, DTAIExperimenterShellExecutor
+from .Executor import NativeExecutor, ShellExecutor

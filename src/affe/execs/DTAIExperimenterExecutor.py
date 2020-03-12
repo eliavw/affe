@@ -1,19 +1,22 @@
 import os
+import subprocess
 import sys
 from functools import partial
 
 from ..cli import get_flow_cli, get_flow_cli_with_monitors
 from ..dtaiexperimenter import Function, Logfile, Process, TimeLimit
-from .Executor import Executor
+from .Executor import Executor, ShellExecutor
 
 
 class DTAIExperimenterExecutor(Executor):
     def __init__(self, workflow, log_filepath=None, timeout_s=None):
-        super().__init__(workflow)
-
-        self.log_filepath = self.set_log_filepath(workflow, log_filepath=log_filepath)
+        self.log_filepath = self.set_log_filepath(
+            workflow, log_filepath=log_filepath
+        )  # This really has to happen first.
         self.timeout_s = self.set_timeout_s(workflow, timeout_s=timeout_s)
         self.monitors = self.set_monitors()
+
+        super().__init__(workflow)
         self.future = None  # Get fixed in the subclasses
         return
 
@@ -72,7 +75,7 @@ class DTAIExperimenterFunctionExecutor(DTAIExperimenterExecutor):
         return Function(self.flow_initialized, monitors=self.monitors)
 
 
-class DTAIExperimenterProcessExecutor(DTAIExperimenterExecutor):
+class DTAIExperimenterProcessExecutor(DTAIExperimenterExecutor, ShellExecutor):
     def __init__(
         self,
         workflow,
@@ -80,102 +83,64 @@ class DTAIExperimenterProcessExecutor(DTAIExperimenterExecutor):
         cli=None,
         absolute=True,
         flow_filepath=None,
-        log_filepath=None,
-        timeout_s=None,
         cwd=None,
         command=None,
-        delayed=False,
+        log_filepath=None,
+        timeout_s=None,
     ):
-        super().__init__(workflow, log_filepath=log_filepath, timeout_s=timeout_s)
-
-        self.cwd = self.set_cwd(cwd=cwd)
-        self.executable = self.set_executable(executable=executable)
-        self.flow_filepath = self.set_flow_filepath(
-            workflow, flow_filepath=flow_filepath
+        DTAIExperimenterExecutor.__init__(
+            self, workflow, log_filepath=log_filepath, timeout_s=timeout_s
         )
-        self.delayed = delayed
-        self.cli = self.set_cli(cli=cli, absolute=absolute, delayed=delayed)
-        self.command = self.set_command(command=command, delayed=delayed)
-        self.future = self.set_future()
 
+        ShellExecutor.__init__(
+            self,
+            workflow,
+            executable=executable,
+            cli=cli,
+            absolute=absolute,
+            flow_filepath=flow_filepath,
+            cwd=cwd,
+            command=command,
+        )
+
+        self.future = self.set_future()
         workflow.dump(flow_filepath=self.flow_filepath)
         return
 
-    @staticmethod
-    def set_cwd(cwd=None):
-        if cwd is None:
-            r = os.getcwd()
-        else:
-            r = cwd
-        return r
+    def set_future(self):
+        return Process(self.command.split(" "), monitors=self.monitors, cwd=self.cwd)
 
-    @staticmethod
-    def set_executable(executable=None):
-        if executable is None:
-            r = sys.executable
-        else:
-            r = executable
-        return r
 
-    def set_cli(self, cli=None, absolute=True, delayed=False):
+class DTAIExperimenterShellExecutor(DTAIExperimenterProcessExecutor):
+    @staticmethod
+    def set_cli(cli=None, absolute=True):
         if cli is not None:
             return cli
-        elif delayed:
-            return self.set_delayed_cli(absolute=absolute)
         else:
-            return self.set_immediate_cli(absolute=absolute)
+            return get_flow_cli_with_monitors(abs=absolute)
 
-    @staticmethod
-    def set_immediate_cli(absolute=True):
-        return get_flow_cli(abs=absolute)
-
-    @staticmethod
-    def set_delayed_cli(absolute=True):
-        return get_flow_cli_with_monitors(abs=absolute)
-
-    @staticmethod
-    def set_flow_filepath(workflow, flow_filepath=None):
-        if flow_filepath is None:
-            r = workflow.flow_filepath
-        else:
-            r = flow_filepath
-
-        assert isinstance(r, str)
-        return r
-
-    def set_command(self, command=None, delayed=False):
+    def set_command(self, command=None):
         if command is not None:
             return command
-        elif delayed:
-            return self.set_delayed_command()
         else:
-            return self.set_immediate_command()
-
-    def set_immediate_command(self):
-        r = """{0} {1} -f {2}""".format(self.executable, self.cli, self.flow_filepath)
-        return r
-
-    def set_delayed_command(self):
-        r = """{0} -l {1} -t {2}""".format(
-            self.set_immediate_command(), self.log_filepath, self.timeout_s
-        )
-        return r
-
-    def set_future(self):
-        if self.delayed:
-            return ReturnCommand(self.command)
-        else:
-            return Process(
-                self.command.split(" "), monitors=self.monitors, cwd=self.cwd
+            return """{0} {1} -f {2} -l {3} -t {4}""".format(
+                self.executable,
+                self.cli,
+                self.flow_filepath,
+                self.log_filepath,
+                self.timeout_s,
             )
 
-    def get_command(self):
-        return self.command
+    def set_future(self):
+        return DelayedShellCommand(self.command)
 
-class ReturnCommand:
-    def __init__(self, command="a string"):
+
+class DelayedShellCommand:
+    """Mini-helper class for DTAIExperimenterShellExecutor, I need to pack a generated command in a future for it to be ran correctly by the superclass.
+    """
+
+    def __init__(self, command):
         self.command = command
-        return
 
-    def run(self):
-        return self.command
+    def run(self, shell=True, **kwargs):
+        return subprocess.call(self.command, shell=shell, **kwargs)
