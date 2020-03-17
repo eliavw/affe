@@ -105,3 +105,18 @@ class ShellExecutor(Executor):
 
     def get_command(self):
         return self.command
+
+
+class ShellCommandExecutor(object):
+    """Very simple class that does not need a flow and just executes a command.
+    """
+
+    def __init__(self, command):
+        self.command = command
+        return
+
+    def execute(self, shell=True, **kwargs):
+        return subprocess.call(self.command, shell=shell, **kwargs)
+
+    def run(self, **kwargs):
+        return self.execute(**kwargs)

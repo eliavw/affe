@@ -14,7 +14,7 @@ from ..execs import (
     DTAIExperimenterProcessExecutor,
     NativeExecutor,
     ShellExecutor,
-    DTAIExperimenterShellExecutor
+    DTAIExperimenterShellExecutor,
 )
 
 
@@ -44,7 +44,7 @@ class Flow:
         shell_now=ShellExecutor,
         local_log=DTAIExperimenterFunctionExecutor,
         shell_log=DTAIExperimenterProcessExecutor,
-        shell_log_autonomous=DTAIExperimenterShellExecutor
+        shell_log_autonomous=DTAIExperimenterShellExecutor, 
     )
 
     def __init__(
@@ -53,7 +53,7 @@ class Flow:
         flow=None,
         imports=None,
         log_filepath="logfile",
-        flow_filepath=None,
+        flow_filepath="flowfile.pkl",
         timeout_s=60,
     ):
         self.log_filepath = log_filepath

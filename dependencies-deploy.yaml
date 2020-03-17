@@ -9,6 +9,9 @@ dependencies:
   - numpy
   - scipy
   - pandas
-  - ipython
   - matplotlib
   - scikit-learn
+  - pip:
+    - lxml
+    - requests
+    - psutil

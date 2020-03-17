@@ -30,8 +30,23 @@ def _dump_lz4(o, fn):
     return True
 
 
+def _dump_txt(o, fn):
+    # Fix object to be a list of strings.
+    if isinstance(o, (list, tuple, set)):
+        assert isinstance(o[0], str)
+    else:
+        assert isinstance(o, str)
+        o = [o]
+
+    with open(fn, "w") as f:
+        f.write("\n".join(o))
+    return True
+
+
 def dump_object(o, fn):
-    actions = dict(pkl=_dump_pkl, json=_dump_json, csv=_dump_csv, lz4=_dump_lz4)
+    actions = dict(
+        pkl=_dump_pkl, json=_dump_json, csv=_dump_csv, lz4=_dump_lz4, txt=_dump_txt
+    )
 
     ext = os.path.splitext(fn)[-1].split(".")[-1]
     try:
