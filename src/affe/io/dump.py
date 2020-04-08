@@ -58,3 +58,24 @@ def dump_object(o, fn):
             ext
         )
         raise Exception(e, msg)
+
+
+def load_object(fn):
+    actions = dict(pkl=_load_pkl,)
+
+    ext = os.path.splitext(fn)[-1].split(".")[-1]
+    try:
+        return actions.get(ext)(fn)
+    except Exception as e:
+        msg = """
+        Possibly; there is no dumping policy regarding extension: {}
+        """.format(
+            ext
+        )
+        raise Exception(e, msg)
+
+
+def _load_pkl(fn):
+    with open(fn, "rb") as f:
+        o = pkl.load(f)
+    return o

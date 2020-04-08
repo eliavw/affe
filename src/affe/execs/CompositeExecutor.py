@@ -100,6 +100,7 @@ class GNUParallelExecutor(object):
         machine_kinds={"pinac", "himec", "cudos"},
         claim_policy="greedy",
         username='user',
+        **flow_commands_extractor_kwargs,
     ):
         self.n_jobs = n_jobs
         self.use_nodes = use_nodes
@@ -108,7 +109,7 @@ class GNUParallelExecutor(object):
         self.child_logs = child_logs
         self.flow_commands_extractor = self.set_flow_commands_extractor(self.child_logs)
         self.flow_commands = self.set_flow_commands(
-            workflows, self.flow_commands_extractor
+            workflows, self.flow_commands_extractor, **flow_commands_extractor_kwargs
         )
         self.flow_commands_filepath = self.set_flow_commands_filepath(
             flow_commands_filepath

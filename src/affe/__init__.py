@@ -6,7 +6,7 @@ try:
     dist_name = __name__
     __version__ = get_distribution(dist_name).version
 
-    from . import io, utils, execs, cli
+    from . import io, utils, execs, cli, demo
     from .flow import Flow
     from .execs import (
         DTAIExperimenterFunctionExecutor,

@@ -42,8 +42,6 @@ def tree_path_abs(tree, node, filename=None, separator=KEYCHAIN_SEPARATOR):
         return root_dir
 
 
-
-
 # Helpers
 def _alter_root_value(tree, value):
     tree = tree.copy()

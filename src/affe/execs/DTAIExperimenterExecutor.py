@@ -4,16 +4,17 @@ import sys
 from functools import partial
 
 from ..cli import get_flow_cli, get_flow_cli_with_monitors
-from ..dtaiexperimenter import Function, Logfile, Process, TimeLimit
+from ..dtaiexperimenter import Function, Logfile, MemoryLimit, Process, TimeLimit
 from .Executor import Executor, ShellExecutor
 
 
 class DTAIExperimenterExecutor(Executor):
-    def __init__(self, workflow, log_filepath=None, timeout_s=None):
+    def __init__(self, workflow, log_filepath=None, timeout_s=None, memory_mb=None):
         self.log_filepath = self.set_log_filepath(
             workflow, log_filepath=log_filepath
         )  # This really has to happen first.
         self.timeout_s = self.set_timeout_s(workflow, timeout_s=timeout_s)
+        self.memory_mb = self.set_memory_mb(workflow, memory_mb=memory_mb)
         self.monitors = self.set_monitors()
 
         super().__init__(workflow)
@@ -32,6 +33,16 @@ class DTAIExperimenterExecutor(Executor):
         return r
 
     @staticmethod
+    def set_memory_mb(workflow, memory_mb=None):
+        # This one is allowed to be None!
+        if memory_mb is None and hasattr(workflow, "memory_mb"):
+            r = workflow.memory_mb
+        else:
+            r = memory_mb
+
+        return r
+
+    @staticmethod
     def set_log_filepath(workflow, log_filepath=None):
         if log_filepath is None:
             r = workflow.log_filepath
@@ -47,8 +58,16 @@ class DTAIExperimenterExecutor(Executor):
         
         Default monitors are a logger and a timeout.
         """
+        monitors = []
+        if self.log_filepath is not None:
+            monitors.append(Logfile(self.log_filepath))
 
-        monitors = [Logfile(self.log_filepath), TimeLimit(self.timeout_s)]
+        if self.timeout_s is not None:
+            monitors.append(TimeLimit(self.timeout_s))
+
+        if self.memory_mb is not None:
+            monitors.append(MemoryLimit(maxmem=self.memory_mb))
+
         return monitors
 
     def execute(self, return_log_filepath=True):
@@ -133,6 +152,27 @@ class DTAIExperimenterShellExecutor(DTAIExperimenterProcessExecutor):
 
     def set_future(self):
         return DelayedShellCommand(self.command)
+
+
+class FunctionExecutor(DTAIExperimenterExecutor):
+    def __init__(self, f, log_filepath=None, timeout_s=None, memory_mb=None, **kwargs):
+        self.flow = f
+        self.config = kwargs
+        self.log_filepath = log_filepath
+        self.timeout_s = timeout_s
+        self.memory_mb = memory_mb
+
+        self.monitors = self.set_monitors()
+        self.flow_initialized = self.set_flow_initialized()
+        self.future = self.set_future()
+        return
+
+    def set_flow_initialized(self):
+        # This is the main difference with the above, this just executes a function straight away.
+        return partial(self.flow, **self.config)
+
+    def set_future(self):
+        return Function(self.flow_initialized, monitors=self.monitors)
 
 
 class DelayedShellCommand:

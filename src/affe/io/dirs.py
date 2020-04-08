@@ -7,6 +7,7 @@ from .CTE import DEFAULT_CHILDREN, LABELS, SEPARATOR
 from .tree import tree_path_abs, get_children
 from .utils import get_code_string
 
+DEFAULT_EXCLUDE = {"note", "notebooks", "notebook", "src", "docs", "tests", "visualisation"}
 
 # Tree creation from filesystem
 def mimic_fs(
@@ -16,7 +17,7 @@ def mimic_fs(
         root = get_default_root(levels_up=root_levels_up)
 
     if exclude is None:
-        exclude = {"note", "src", "docs", "tests", "visualisation"}
+        exclude = DEFAULT_EXCLUDE
 
     tree = mimic_directory(root, exclude_children=exclude)
 
@@ -54,7 +55,7 @@ def mimic_fs(
 
 def mimic_directory(directory_path, exclude_children=None):
     if exclude_children is None:
-        exclude_children = {"note", "src", "docs", "tests"}
+        exclude_children = DEFAULT_EXCLUDE
 
     children = [
         d
@@ -191,8 +192,10 @@ def get_children_paths(tree, node):
     children_paths = [tree_path_abs(tree, c) for c in children]
     return children_paths
 
+
 def get_subdirectory_paths(tree, node):
     return {os.path.split(v)[-1]: v for v in get_children_paths(tree, node)}
+
 
 # Tree verification
 def check_existence_of_directory(tree, nodes=None):
