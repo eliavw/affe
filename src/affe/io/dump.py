@@ -3,6 +3,7 @@ import json
 import dill as pkl
 import pandas as pd
 import joblib
+import toml
 
 
 def _dump_pkl(o, fn):
@@ -42,10 +43,14 @@ def _dump_txt(o, fn):
         f.write("\n".join(o))
     return True
 
+def _dump_toml(o, fn):
+    toml.dump(o, fn)
+    return True
+
 
 def dump_object(o, fn):
     actions = dict(
-        pkl=_dump_pkl, json=_dump_json, csv=_dump_csv, lz4=_dump_lz4, txt=_dump_txt
+        pkl=_dump_pkl, json=_dump_json, csv=_dump_csv, lz4=_dump_lz4, txt=_dump_txt, toml=_dump_toml
     )
 
     ext = os.path.splitext(fn)[-1].split(".")[-1]
