@@ -1,3 +1,6 @@
+"""This file contains some convenience utilities to figure out which pinacs are good to use at a given moment.
+"""
+
 from lxml import html
 import requests
 import pandas as pd
@@ -208,8 +211,8 @@ def generate_nodefile(
 
 def _convert_max_percentage_thread_claim(max_percentage_thread_claim):
     if isinstance(max_percentage_thread_claim, str):
-        if max_percentage_thread_claim in {"asshole"}:
-            max_percentage_thread_claim = 90
+        if max_percentage_thread_claim in {"panic"}:
+            max_percentage_thread_claim = 100
         elif max_percentage_thread_claim in {"deadline"}:
             max_percentage_thread_claim = 80
         elif max_percentage_thread_claim in {"high"}:
@@ -220,4 +223,5 @@ def _convert_max_percentage_thread_claim(max_percentage_thread_claim):
             max_percentage_thread_claim = 30
     else:
         assert isinstance(max_percentage_thread_claim, int)
+        assert 0 < max_percentage_thread_claim < 101
     return max_percentage_thread_claim

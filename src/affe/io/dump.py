@@ -44,7 +44,8 @@ def _dump_txt(o, fn):
     return True
 
 def _dump_toml(o, fn):
-    toml.dump(o, fn)
+    with open(fn, "w") as f:
+        toml.dump(o, f)
     return True
 
 
@@ -66,14 +67,14 @@ def dump_object(o, fn):
 
 
 def load_object(fn):
-    actions = dict(pkl=_load_pkl,)
+    actions = dict(pkl=_load_pkl,toml=_load_toml)
 
     ext = os.path.splitext(fn)[-1].split(".")[-1]
     try:
         return actions.get(ext)(fn)
     except Exception as e:
         msg = """
-        Possibly; there is no dumping policy regarding extension: {}
+        Possibly; there is no loading policy regarding extension: {}
         """.format(
             ext
         )
@@ -84,3 +85,11 @@ def _load_pkl(fn):
     with open(fn, "rb") as f:
         o = pkl.load(f)
     return o
+
+def _load_toml(fn):
+    with open(fn, "r") as f:
+        o = toml.load(f)
+    return o
+
+
+

@@ -29,7 +29,7 @@ def get_default_nodefile(
 
 
 class CompositeExecutor(Executor):
-    def __init__(self, workflows, executor):
+    def __init__(self, workflows, executor=None):
         self.child_workflows = workflows
         self.n_child_workflows = len(self.child_workflows)
         self.child_executor = executor
@@ -42,9 +42,12 @@ class CompositeExecutor(Executor):
         ]
 
     def execute_child(self, child_index=0, **kwargs):
-        return self.child_executor(
-            self.child_workflows[child_index], **kwargs
-        ).execute()
+        if self.child_executor in {None}:
+            return self.child_workflows[child_index].run(**kwargs)
+        else:
+            return self.child_executor(
+                self.child_workflows[child_index], **kwargs
+            ).execute()
 
     def get_command_child(self, child_index=0, **kwargs):
         """Child executor should obviously be compatible with the get_command method.
@@ -79,6 +82,7 @@ class JoblibExecutor(CompositeExecutor):
 class GNUParallelExecutor(object):
     executors = dict(shell_command=ShellCommandExecutor)
 
+    # You need shell commands from your children flows, so there's two ways of extracting them.
     extractors = dict(
         shell_now=ShellExecutor, shell_log_autonomous=DTAIExperimenterShellExecutor,
     )
@@ -89,8 +93,8 @@ class GNUParallelExecutor(object):
         n_jobs=1,
         child_logs=True,
         logs=False,
-        flow_commands_filepath=None,
-        nodefile_filepath=None,
+        flow_commands_filepath="commands.txt",
+        nodefile_filepath="nodefile.txt",
         executor=None,
         use_nodes=False,
         progress=False,
@@ -99,7 +103,7 @@ class GNUParallelExecutor(object):
         max_percentage_thread_claim=50,
         machine_kinds={"pinac", "himec", "cudos"},
         claim_policy="greedy",
-        username='user',
+        username="user",
         **flow_commands_extractor_kwargs,
     ):
         self.n_jobs = n_jobs
@@ -166,11 +170,8 @@ class GNUParallelExecutor(object):
 
     @staticmethod
     def set_flow_commands_filepath(flow_commands_filepath):
-        if flow_commands_filepath is None:
-            r = "commands.txt"
-        else:
-            assert isinstance(flow_commands_filepath, str)
-            r = flow_commands_filepath
+        assert isinstance(flow_commands_filepath, str)
+        r = flow_commands_filepath
         return r
 
     @staticmethod
@@ -181,7 +182,7 @@ class GNUParallelExecutor(object):
         max_percentage_thread_claim=50,
         machine_kinds={"pinac", "himec", "cudos"},
         claim_policy="greedy",
-        username='user',
+        username="user",
     ):
         assert (
             use_nodes
@@ -199,11 +200,8 @@ class GNUParallelExecutor(object):
     @staticmethod
     def set_nodefile_filepath(use_nodes, nodefile_filepath):
         if use_nodes:
-            if nodefile_filepath is None:
-                r = "nodefile.txt"
-            else:
-                assert isinstance(nodefile_filepath, str)
-                r = nodefile_filepath
+            assert isinstance(nodefile_filepath, str)
+            r = nodefile_filepath
         else:
             # Do not use nodes => no need for nodefile_filepath
             r = None

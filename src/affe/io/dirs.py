@@ -63,6 +63,7 @@ def mimic_directory(directory_path, exclude_children=None):
         if os.path.isdir(os.path.join(directory_path, d))  # Has to be a directory
         if not d.startswith(".")  # Exclude hidden dirs
         if not d.startswith("_")  # Exclude hidden dirs
+        if ".egg" not in d # Exclude eggs
         if d not in exclude_children
     ]
 
