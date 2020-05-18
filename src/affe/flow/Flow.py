@@ -100,6 +100,11 @@ class Flow:
         e = self.executors.get("shell_log")(self, **kwargs)
         return e.execute(return_log_filepath=return_log_filepath)
 
+    def run_via_shell_with_log(self, return_log_filepath=True, **kwargs):
+        """Synonym to method above.
+        """
+        return self.run_with_log_via_shell(return_log_filepath=return_log_filepath, **kwargs)
+
     def get_shell_command(self, **kwargs):
         e = self.executors.get("shell_now")(self, **kwargs)
         return e.command
