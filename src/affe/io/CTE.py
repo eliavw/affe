@@ -7,6 +7,6 @@ DEFAULT_CHILDREN = dict(
     root=["cli", "data", "out", "scripts"],
     out=["manual", "preprocessing", "fit", "predict"],
     model=["models", "logs", "timings"],
-    flow=["config", "logs", "results", "timings", "tmp", "flows"],
+    flow=["config", "logs", "results", "models", "timings", "tmp", "flows"],
 )
 

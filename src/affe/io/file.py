@@ -22,23 +22,25 @@ def get_filepath(
     node=None,
     check_directory=True,
     check_file=False,
+    filename=None,
     **code_string_kwargs,
 ):
     if basename is None and node is not None:
         basename = node
 
-    filename = get_filename(
-        basename=basename,
-        prefix=prefix,
-        suffix=suffix,
-        extension=extension,
-        separator=separator,
-        **code_string_kwargs,
-    )
+    if filename is None:
+        filename = get_filename(
+            basename=basename,
+            prefix=prefix,
+            suffix=suffix,
+            extension=extension,
+            separator=separator,
+            **code_string_kwargs,
+        )
 
     filepath = abspath(tree, node, filename=filename)
 
-    # Ensure existence of the directory, we do not care about overwriting a file.
+    # Ensure existence of the directory, we (by default) do not care about overwriting a file.
     assert _check(filepath, check_directory=check_directory, check_file=check_file)
 
     return filepath
@@ -90,7 +92,7 @@ def _check(filename, check_directory=True, check_file=False):
 
     # If file already exists: complain
     if check_file:
-        assert os.path.isfile(filename)
+        assert os.path.isfile(filename), "Filename {} does not exist".format(filename)
     return True
 
 
@@ -103,9 +105,17 @@ FN_TEMPLATE_CLASSIC_FLOW = dict(
     flows=partial(get_filepath, extension="pkl", node="flows"),
 )
 
-def get_template_filenames(
-    tree, template=FN_TEMPLATE_CLASSIC_FLOW, **kwargs
+
+def get_default_model_filename(
+    data_identifier="", model_identifier="", extension="pkl", **kwargs
 ):
+    model_filename = get_filename(
+        basename=[model_identifier, data_identifier], extension=extension, **kwargs
+    )
+    return model_filename
+
+
+def get_template_filenames(tree, template=FN_TEMPLATE_CLASSIC_FLOW, **kwargs):
     template_filenames = {}
     for k in tree:
         if template.get(k, False):

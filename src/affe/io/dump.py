@@ -5,7 +5,51 @@ import pandas as pd
 import joblib
 import toml
 
+# Interface Methods
+def save_object(o, fn):
+    """Alias for dump object method.
+    """
+    return dump_object(o, fn)
 
+
+def dump_object(o, fn):
+    actions = dict(
+        pkl=_dump_pkl,
+        json=_dump_json,
+        csv=_dump_csv,
+        lz4=_dump_lz4,
+        txt=_dump_txt,
+        toml=_dump_toml,
+    )
+
+    ext = os.path.splitext(fn)[-1].split(".")[-1]
+    try:
+        return actions.get(ext)(o, fn)
+    except Exception as e:
+        msg = """
+        Possibly; there is no dumping policy regarding extension: {}
+        """.format(
+            ext
+        )
+        raise Exception(e, msg)
+
+
+def load_object(fn):
+    actions = dict(pkl=_load_pkl, toml=_load_toml)
+
+    ext = os.path.splitext(fn)[-1].split(".")[-1]
+    try:
+        return actions.get(ext)(fn)
+    except Exception as e:
+        msg = """
+        Possibly; there is no loading policy regarding extension: {}
+        """.format(
+            ext
+        )
+        raise Exception(e, msg)
+
+
+# Actual loaders/dumpers
 def _dump_pkl(o, fn):
     with open(fn, "wb") as f:
         pkl.dump(o, f)
@@ -43,42 +87,11 @@ def _dump_txt(o, fn):
         f.write("\n".join(o))
     return True
 
+
 def _dump_toml(o, fn):
     with open(fn, "w") as f:
         toml.dump(o, f)
     return True
-
-
-def dump_object(o, fn):
-    actions = dict(
-        pkl=_dump_pkl, json=_dump_json, csv=_dump_csv, lz4=_dump_lz4, txt=_dump_txt, toml=_dump_toml
-    )
-
-    ext = os.path.splitext(fn)[-1].split(".")[-1]
-    try:
-        return actions.get(ext)(o, fn)
-    except Exception as e:
-        msg = """
-        Possibly; there is no dumping policy regarding extension: {}
-        """.format(
-            ext
-        )
-        raise Exception(e, msg)
-
-
-def load_object(fn):
-    actions = dict(pkl=_load_pkl,toml=_load_toml)
-
-    ext = os.path.splitext(fn)[-1].split(".")[-1]
-    try:
-        return actions.get(ext)(fn)
-    except Exception as e:
-        msg = """
-        Possibly; there is no loading policy regarding extension: {}
-        """.format(
-            ext
-        )
-        raise Exception(e, msg)
 
 
 def _load_pkl(fn):
@@ -86,10 +99,8 @@ def _load_pkl(fn):
         o = pkl.load(f)
     return o
 
+
 def _load_toml(fn):
     with open(fn, "r") as f:
         o = toml.load(f)
     return o
-
-
-

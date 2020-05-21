@@ -254,6 +254,8 @@ def get_root_directory(root=None, children=None, root_levels_up=2):
 
 
 def get_flow_directory(keyword="manual", children=None, root_levels_up=2):
+    """Get a tree structure that represents a typical flow directory
+    """
     if children is None:
         children = DEFAULT_CHILDREN.get("flow")
 
