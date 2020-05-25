@@ -64,8 +64,9 @@ class CompositeExecutor(Executor):
 
 
 class JoblibExecutor(CompositeExecutor):
-    def __init__(self, workflows, executor, n_jobs=1):
+    def __init__(self, workflows, executor, n_jobs=1, verbose = 0):
         self.n_jobs = n_jobs
+        self.verbose = verbose
         super().__init__(workflows, executor)
         return
 
@@ -73,11 +74,12 @@ class JoblibExecutor(CompositeExecutor):
         if n_jobs is None:
             n_jobs = self.n_jobs
 
-        return Parallel(n_jobs=n_jobs)(
+        return Parallel(n_jobs=n_jobs, verbose = self.verbose)(
             delayed(self.execute_child)(child_index=i, **kwargs)
             for i in range(self.n_child_workflows)
         )
 
+        
 
 class GNUParallelExecutor(object):
     executors = dict(shell_command=ShellCommandExecutor)

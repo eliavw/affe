@@ -21,6 +21,8 @@ from ..execs import (
 class Flow:
     """A workflow object.
 
+    A flow is an abstraction of 'something' that needs to be executed
+
     A good workflow abstracts away a lot of boilerplate regarding
         - config
         - io

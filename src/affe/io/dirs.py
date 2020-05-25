@@ -13,9 +13,12 @@ DEFAULT_EXCLUDE = {"note", "notebooks", "notebook", "src", "docs", "tests", "vis
 def mimic_fs(
     root=None, root_levels_up=2, exclude=None, depth=1, flatten=True, rename_root=None
 ):
+
+    # get the root directory
     if root is None:
         root = get_default_root(levels_up=root_levels_up)
 
+    # directories in the root directory to ignore
     if exclude is None:
         exclude = DEFAULT_EXCLUDE
 

@@ -142,7 +142,7 @@ class DTAIExperimenterShellExecutor(DTAIExperimenterProcessExecutor):
         if command is not None:
             return command
         else:
-            return """{0} {1} -f {2} -l {3} -t {4}""".format(
+            return """{0} {1} -f '{2}' -l '{3}' -t {4}""".format(
                 self.executable,
                 self.cli,
                 self.flow_filepath,
