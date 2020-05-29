@@ -1,4 +1,9 @@
+import traceback
+
+from dask import distributed
+from distributed import Client, Future
 from joblib import Parallel, delayed
+from tqdm import tqdm
 
 from ..io import dump_object
 from .Executor import Executor, ShellExecutor, ShellCommandExecutor
@@ -17,7 +22,7 @@ def get_default_nodefile(
     nodefile = generate_nodefile(
         df=None,
         desired_memory_per_thread=desired_memory_per_thread,
-        desired_nb_threads=Nondesired_nb_threadse,
+        desired_nb_threads=desired_nb_threads,
         max_percentage_thread_claim=max_percentage_thread_claim,
         kinds=machine_kinds,
         claim_policy=claim_policy,
@@ -61,6 +66,32 @@ class CompositeExecutor(Executor):
             self.get_command_child(child_index=i, **kwargs)
             for i in range(self.n_child_workflows)
         ]
+
+class DaskExecutor(Executor):
+    # I don't need the functionality from CompositeExecutor
+    # I'm simply going to implement the execute method
+    def __init__(self, flows, executor, scheduler, show_progress = False):
+        self.flows = flows
+        self.executor = executor
+        self.scheduler = scheduler
+        self.show_progress = show_progress
+
+    def execute(self, **executor_options):
+        with Client(adress=self.scheduler) as client:
+            futures = []
+            for flow in self.flows:
+                executor = self.executor(flow, **executor_options)
+                future = client.submit(executor.execute, executor, pure = False)
+                futures.append(future)
+            with tqdm(total=len(futures)) as pbar:
+                for future, _ in distributed.as_completed(futures, with_results = True, raise_errors = False):
+                    pbar.update(1)
+                    f: Future = future
+                    if f.exception() is not None:
+                        traceback.print_tb(f.traceback())
+                        print(f.exception())
+
+
 
 
 class JoblibExecutor(CompositeExecutor):
