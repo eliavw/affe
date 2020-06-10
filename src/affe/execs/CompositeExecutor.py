@@ -77,7 +77,7 @@ class DaskExecutor(Executor):
         self.show_progress = show_progress
 
     def execute(self, **executor_options):
-        with Client(adress=self.scheduler) as client:
+        with Client(self.scheduler) as client:
             futures = []
             for flow in self.flows:
                 executor = self.executor(flow, **executor_options)
