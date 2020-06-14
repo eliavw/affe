@@ -4,6 +4,7 @@ import dill as pkl
 import pandas as pd
 import joblib
 import toml
+import numpy as np
 
 # Interface Methods
 def save_object(o, fn):
@@ -35,7 +36,7 @@ def dump_object(o, fn):
 
 
 def load_object(fn):
-    actions = dict(pkl=_load_pkl, toml=_load_toml)
+    actions = dict(pkl=_load_pkl, toml=_load_toml, npy=_load_npy)
 
     ext = os.path.splitext(fn)[-1].split(".")[-1]
     try:
@@ -104,3 +105,6 @@ def _load_toml(fn):
     with open(fn, "r") as f:
         o = toml.load(f)
     return o
+
+def _load_npy(fn):
+    return np.load(fn)

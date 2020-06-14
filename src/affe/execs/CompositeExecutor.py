@@ -1,14 +1,24 @@
 import traceback
+import warnings
 
-from dask import distributed
-from distributed import Client, Future
 from joblib import Parallel, delayed
-from tqdm import tqdm
 
 from ..io import dump_object
-from .Executor import Executor, ShellExecutor, ShellCommandExecutor
 from .DTAIExperimenterExecutor import DTAIExperimenterShellExecutor
+from .Executor import Executor, ShellCommandExecutor, ShellExecutor
 from .pinac import generate_nodefile
+
+try:
+    from tqdm import tqdm
+    from dask import distributed
+    from distributed import Client, Future
+except ImportError:
+    Client = None
+    Future = None
+    msg = """
+    Dask (or tqdm) is not installed, therefore using the Dask Executor will not be an option.
+    """
+    warnings.warn(msg)
 
 
 def get_default_nodefile(
@@ -67,10 +77,11 @@ class CompositeExecutor(Executor):
             for i in range(self.n_child_workflows)
         ]
 
+
 class DaskExecutor(Executor):
     # I don't need the functionality from CompositeExecutor
     # I'm simply going to implement the execute method
-    def __init__(self, flows, executor, scheduler, show_progress = False):
+    def __init__(self, flows, executor, scheduler, show_progress=False):
         self.flows = flows
         self.executor = executor
         self.scheduler = scheduler
@@ -81,10 +92,12 @@ class DaskExecutor(Executor):
             futures = []
             for flow in self.flows:
                 executor = self.executor(flow, **executor_options)
-                future = client.submit(executor.execute, executor, pure = False)
+                future = client.submit(executor.execute, executor, pure=False)
                 futures.append(future)
             with tqdm(total=len(futures)) as pbar:
-                for future, _ in distributed.as_completed(futures, with_results = True, raise_errors = False):
+                for future, _ in distributed.as_completed(
+                    futures, with_results=True, raise_errors=False
+                ):
                     pbar.update(1)
                     f: Future = future
                     if f.exception() is not None:
@@ -92,10 +105,8 @@ class DaskExecutor(Executor):
                         print(f.exception())
 
 
-
-
 class JoblibExecutor(CompositeExecutor):
-    def __init__(self, workflows, executor, n_jobs=1, verbose = 0):
+    def __init__(self, workflows, executor, n_jobs=1, verbose=0):
         self.n_jobs = n_jobs
         self.verbose = verbose
         super().__init__(workflows, executor)
@@ -105,12 +116,11 @@ class JoblibExecutor(CompositeExecutor):
         if n_jobs is None:
             n_jobs = self.n_jobs
 
-        return Parallel(n_jobs=n_jobs, verbose = self.verbose)(
+        return Parallel(n_jobs=n_jobs, verbose=self.verbose)(
             delayed(self.execute_child)(child_index=i, **kwargs)
             for i in range(self.n_child_workflows)
         )
 
-        
 
 class GNUParallelExecutor(object):
     executors = dict(shell_command=ShellCommandExecutor)
