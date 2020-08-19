@@ -1,19 +1,20 @@
 import os
-from functools import partial
+from functools import lru_cache
 from os.path import dirname
 
-from ..utils import flatten_dict, keychain
-from .CTE import DEFAULT_CHILDREN, LABELS, SEPARATOR
+from .CTE import DEFAULT_CHILDREN
 from .tree import tree_path_abs, get_children
 from .utils import get_code_string
+from ..utils import flatten_dict, keychain
 
-DEFAULT_EXCLUDE = {"note", "notebooks", "notebook", "src", "docs", "tests", "visualisation"}
+DEFAULT_EXCLUDE = frozenset(["note", "notebooks", "notebook", "src", "docs", "tests", "visualisation"])
+
 
 # Tree creation from filesystem
+@lru_cache(maxsize=None)
 def mimic_fs(
-    root=None, root_levels_up=2, exclude=None, depth=1, flatten=True, rename_root=None
+        root=None, root_levels_up=2, exclude=None, depth=1, flatten=True, rename_root=None
 ):
-
     # get the root directory
     if root is None:
         root = get_default_root(levels_up=root_levels_up)
@@ -66,7 +67,7 @@ def mimic_directory(directory_path, exclude_children=None):
         if os.path.isdir(os.path.join(directory_path, d))  # Has to be a directory
         if not d.startswith(".")  # Exclude hidden dirs
         if not d.startswith("_")  # Exclude hidden dirs
-        if ".egg" not in d # Exclude eggs
+        if ".egg" not in d  # Exclude eggs
         if d not in exclude_children
     ]
 
@@ -91,12 +92,12 @@ def get_directory(root=None, children=None, root_levels_up=0):
 
 # Tree modification
 def insert_new_subdirectory(
-    tree,
-    parent="root",
-    child="",
-    code_string=False,
-    return_key=False,
-    **code_string_kwargs,
+        tree,
+        parent="root",
+        child="",
+        code_string=False,
+        return_key=False,
+        **code_string_kwargs,
 ):
     """
     Insert a new subdirectory entry in the given directory tree.
@@ -124,12 +125,12 @@ def insert_new_subdirectory(
 
 
 def insert_old_subdirectory(
-    tree,
-    parent="root",
-    child=None,
-    code_string=False,
-    return_key=False,
-    **code_string_kwargs,
+        tree,
+        parent="root",
+        child=None,
+        code_string=False,
+        return_key=False,
+        **code_string_kwargs,
 ):
     """
     Insert an existing subdirectory tree in the given directory tree.
@@ -166,12 +167,12 @@ def insert_old_subdirectory(
 
 
 def insert_subdirectory(
-    tree,
-    parent="root",
-    child=None,
-    code_string=False,
-    return_key=False,
-    **code_string_kwargs,
+        tree,
+        parent="root",
+        child=None,
+        code_string=False,
+        return_key=False,
+        **code_string_kwargs,
 ):
     actions = {}
     actions[str] = insert_new_subdirectory
@@ -214,7 +215,7 @@ def check_existence_of_directory(tree, nodes=None):
 
     for node in nodes:
         assert (
-            node in tree.keys()
+                node in tree.keys()
         ), "You are asking for the existence of a directory unknown to this tree"
 
         path = tree_path_abs(tree, node)
@@ -236,7 +237,6 @@ def get_directory_name(name=None, code_string=False, **code_string_kwargs):
 
 
 def rename_directory(tree, source="root", target="rootroot"):
-
     tree = tree.copy()
 
     # 1. Replace the entry of source

@@ -79,10 +79,9 @@ class GenericBenchmark(Flow):
     ):
         if flow_identifier is None:
             flow_identifier = self.flow_identifier
-
         # Perform duties
         fs = mimic_fs(
-            root_levels_up=root_levels_up, depth=fs_depth, exclude=exclude_in_scan,
+            root_levels_up=root_levels_up, depth=fs_depth, exclude=frozenset(exclude_in_scan) if exclude_in_scan is not None else exclude_in_scan,
         )
 
         ## Build the filesystem we desire
