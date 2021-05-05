@@ -8,15 +8,16 @@ from ..cli import get_flow_cli
 class Executor(object):
     def __init__(self, workflow):
 
-        self.flow = workflow.flow
+        self.flow = self.extract_flow_from_workflow(workflow)
         self.config = workflow.config
         return
 
-    def extract_flow(self, workflow):
+    def extract_flow_from_workflow(self, workflow):
         if getattr(workflow, "flow", None) is not None:
             return workflow.flow
         elif getattr(workflow, "flow_source_code", None) is not None:
-            return exec(workflow.flow)
+            f = exec(workflow.flow)
+            return f
         else:
             raise ValueError(
                 "No flow method, nor flow source code found in this workflow."
