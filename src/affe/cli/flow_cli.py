@@ -27,9 +27,16 @@ def main(flow_filepath, verbosity=1):
     # Get flow
     flow = Flow.load(flow_filepath)
 
-    # Flow prerequisites (typically custom imports)
-    if flow.imports_source_code is not None:
-        exec(flow.imports_source_code)
+    # Some metaprogramming to extract shipped sourcecode
+    if getattr(flow, "imports_source_code", None) is not None:
+        if getattr(flow, "imports", None) is None:
+            f = exec(flow.imports_source_code)
+            flow.imports = f
+
+    if getattr(flow, "flow_source_code", None) is not None:
+        if getattr(flow, "flow", None) is None:
+            f = exec(flow.flow_source_code)
+            flow.flow = f
 
     # Run Flow
     flow.run()
