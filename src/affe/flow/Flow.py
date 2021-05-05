@@ -29,11 +29,11 @@ class Flow:
         - execution
 
     For the executors, we introduce the following terminology;
-        `local`:    Execute flow the current process
-        `shell`:    Execute flow in a new process
+        `local`:    Execute flow in python process
+        `shell`:    Execute flow in a shell
 
-        `direct`:   Stderr and stdout go as default
-        `logged`:   Stderr and stdout are collected in a logfile.
+        `now`:   Stderr and stdout go as default
+        `log`:   Stderr and stdout are collected in a logfile.
 
         `command`:
 
@@ -66,7 +66,7 @@ class Flow:
 
         self.config = config
 
-        # Manage imports
+        # Flows and Imports are python-functions
         self.imports = imports
         self.flow = flow
         return
