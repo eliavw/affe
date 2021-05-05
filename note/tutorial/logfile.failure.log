@@ -1,6 +1,6 @@
 [SETTINGS] {
-  "date": "2021/05/05 22:02:04",
-  "date_iso": "2021-05-05T22:02:04.060408",
+  "date": "2021/05/05 22:09:01",
+  "date_iso": "2021-05-05T22:09:01.789337",
   "params": null,
   "system": {
     "nodename": "calypso.local",
@@ -11,33 +11,33 @@
     "system": "Darwin",
     "cpu_count": 8,
     "cpu_times": {
-      "user": 64027.99,
-      "system": 41052.31,
-      "idle": 1430572.88,
+      "user": 64145.31,
+      "system": 41131.77,
+      "idle": 1433718.02,
       "nice": 0.0
     },
-    "cpu_percent": 32.5,
+    "cpu_percent": 21.4,
     "virtual_memory": {
       "total": 17179869184,
-      "available": 1382129664,
-      "percent": 92.0,
-      "used": 1869484032,
-      "free": 27463680
+      "available": 1406914560,
+      "percent": 91.8,
+      "used": 1860214784,
+      "free": 17539072
     }
   },
   "process": {
     "username": "zissou",
     "cwd": "/Users/zissou/repos/affe/note/tutorial",
-    "create_time": 1620244917.178397,
+    "create_time": 1620245334.469866,
     "cpu_times": {
-      "user": 0.025455132,
-      "system": 0.008613115
+      "user": 0.026479036,
+      "system": 0.008578913
     }
   },
   "logfile": "logfile",
   "max_time": 60.0,
   "function": {
-    "target": "functools.partial(<function hello_world at 0x7fa83bd1d0d0>, None)",
+    "target": "functools.partial(<function hello_world at 0x7ff8f378ef70>, None)",
     "args": []
   }
 }

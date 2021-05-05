@@ -11,6 +11,10 @@ class FlowOne(Flow):
         self.root_levels_up = root_levels_up
         self.out_dp = out_dp
 
+        # Ensure existence of your directories
+        self._log_dp.mkdir(parents=True, exist_ok=True)
+        self._flow_dp.mkdir(parents=True, exist_ok=True)
+
         super().__init__(
             log_filepath=str(self.log_fp), flow_filepath=str(self.flow_fp), **kwargs
         )
