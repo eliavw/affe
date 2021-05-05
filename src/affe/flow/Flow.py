@@ -68,11 +68,9 @@ class Flow:
 
         self.config = config
 
-        # Flows and Imports are python-functions
-        if imports is not None:
-            self.imports = imports
-        if flow is not None:
-            self.flow = flow
+        # If you provide python function directly, affe handles that.
+        self.imports_source_code = imports
+        self.flow_source_code = flow
         return
 
     # All things execution
@@ -138,18 +136,20 @@ class Flow:
     # Properties
     @property
     def imports_source_code(self):
-        if getattr(self, "_imports_source_code", None) is None:
-            if self.imports is not None:
-                self._imports_source_code = extract_source_of_function(self.imports)
-            else:
-                self._imports_source_code = None
-        return self._imports_source_code
+        return getattr(self, "_imports_source_code", None)
+
+    @imports_source_code.setter
+    def imports_source_code(self, imports_function):
+        if imports_function is not None:
+            self._imports_source_code = extract_source_of_function(imports_function)
+        return
 
     @property
     def flow_source_code(self):
-        if getattr(self, "_flow_source_code", None) is None:
-            if self.flow is not None:
-                self._flow_source_code = extract_source_of_function(self.flow)
-            else:
-                self._flow_source_code = None
-        return self._flow_source_code
+        return getattr(self, "_flow_source_code", None)
+
+    @flow_source_code.setter
+    def flow_source_code(self, flow_function):
+        if flow_function is not None:
+            self._flow_source_code = extract_source_of_function(flow_function)
+        return

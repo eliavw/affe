@@ -1,0 +1,69 @@
+[SETTINGS] {
+  "date": "2021/05/05 20:25:12",
+  "date_iso": "2021-05-05T20:25:12.145688",
+  "params": null,
+  "system": {
+    "nodename": "calypso.local",
+    "machine": "x86_64",
+    "platform": "macOS-10.16-x86_64-i386-64bit",
+    "processor": "i386",
+    "version": "Darwin Kernel Version 20.4.0: Fri Mar  5 01:14:02 PST 2021; root:xnu-7195.101.1~3/RELEASE_ARM64_T8101",
+    "system": "Darwin",
+    "cpu_count": 8,
+    "cpu_times": {
+      "user": 61750.2,
+      "system": 39468.65,
+      "idle": 1387937.49,
+      "nice": 0.0
+    },
+    "cpu_percent": 21.9,
+    "virtual_memory": {
+      "total": 17179869184,
+      "available": 1507958784,
+      "percent": 91.2,
+      "used": 1945333760,
+      "free": 15609856
+    }
+  },
+  "process": {
+    "username": "zissou",
+    "cwd": "/Users/zissou/repos/affe/note/tutorial",
+    "create_time": 1620239105.486916,
+    "cpu_times": {
+      "user": 0.02607766,
+      "system": 0.008201248
+    }
+  },
+  "logfile": "logfile",
+  "max_time": 60.0,
+  "function": {
+    "target": "functools.partial(<function hello_world at 0x7ff6f3cc90d0>, None)",
+    "args": []
+  }
+}
+[INFO] Start: Run process
+[INFO] Write log to logfile.running.log
+[INFO] Finished: Run process 0.002 seconds
+[ERROR] Traceback (most recent call last):
+  File "/Users/zissou/repos/affe/src/affe/dtaiexperimenter/process.py", line 247, in run
+    result = self._run_execute()
+  File "/Users/zissou/repos/affe/src/affe/dtaiexperimenter/process.py", line 509, in _run_execute
+    self.p.start()
+  File "/opt/miniconda3/envs/affe/lib/python3.9/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+  File "/opt/miniconda3/envs/affe/lib/python3.9/multiprocessing/context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+  File "/opt/miniconda3/envs/affe/lib/python3.9/multiprocessing/context.py", line 284, in _Popen
+    return Popen(process_obj)
+  File "/opt/miniconda3/envs/affe/lib/python3.9/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/opt/miniconda3/envs/affe/lib/python3.9/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/opt/miniconda3/envs/affe/lib/python3.9/multiprocessing/popen_spawn_posix.py", line 47, in _launch
+    reduction.dump(process_obj, fp)
+  File "/opt/miniconda3/envs/affe/lib/python3.9/multiprocessing/reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+AttributeError: Can't pickle local object 'Function._run_setup.<locals>.wrap.<locals>.wrapper'
+
+[ERROR] Exception: Can't pickle local object 'Function._run_setup.<locals>.wrap.<locals>.wrapper'
+[WARNING] Exit:other; Returncode:999; Time:0

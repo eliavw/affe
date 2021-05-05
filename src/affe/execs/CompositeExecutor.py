@@ -121,7 +121,7 @@ class JoblibExecutor(CompositeExecutor):
         )
 
 
-class GNUParallelExecutor(object):
+class GNUParallelExecutor:
     executors = dict(shell_command=ShellCommandExecutor)
 
     # You need shell commands from your children flows, so there's two ways of extracting them.

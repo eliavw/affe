@@ -20,7 +20,7 @@ from ..io import (
 class GenericBenchmark(Flow):
     """Generic example of a benchmark experiment.
 
-    N.b.:This is an abstract class, will fail if used directly
+    N.b.:This is an abstract class, will FAIL if used directly!
     """
 
     flow_identifier = "GenericBenchmark"

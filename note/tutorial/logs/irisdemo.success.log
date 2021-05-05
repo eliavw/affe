@@ -1,0 +1,58 @@
+[SETTINGS] {
+  "date": "2021/05/05 20:21:14",
+  "date_iso": "2021-05-05T20:21:14.802003",
+  "params": null,
+  "system": {
+    "nodename": "calypso.local",
+    "machine": "x86_64",
+    "platform": "macOS-10.16-x86_64-i386-64bit",
+    "processor": "i386",
+    "version": "Darwin Kernel Version 20.4.0: Fri Mar  5 01:14:02 PST 2021; root:xnu-7195.101.1~3/RELEASE_ARM64_T8101",
+    "system": "Darwin",
+    "cpu_count": 8,
+    "cpu_times": {
+      "user": 61664.98,
+      "system": 39409.55,
+      "idle": 1386182.71,
+      "nice": 0.0
+    },
+    "cpu_percent": 9.1,
+    "virtual_memory": {
+      "total": 17179869184,
+      "available": 1527439360,
+      "percent": 91.1,
+      "used": 1925537792,
+      "free": 57593856
+    }
+  },
+  "process": {
+    "username": "zissou",
+    "cwd": "/Users/zissou/repos/affe/note/tutorial",
+    "create_time": 1620238706.133335,
+    "cpu_times": {
+      "user": 0.040214452,
+      "system": 0.013807945
+    }
+  },
+  "logfile": "logs/irisdemo",
+  "max_time": 60.0,
+  "command": "/opt/miniconda3/envs/affe/bin/python /Users/zissou/repos/affe/src/affe/cli/flow_cli.py -f flowfile.pkl"
+}
+[INFO] cmd:/opt/miniconda3/envs/affe/bin/python /Users/zissou/repos/affe/src/affe/cli/flow_cli.py -f flowfile.pkl; cwd:/Users/zissou/repos/affe/note/tutorial
+[INFO] Start: Run process
+[INFO] Write log to logs/irisdemo.running.log
+
+    Start flow_cli.py.
+    
+I am about to execute the IRIS FLOW
+BUT FIRST: I shall sleep 0 seconds
+I WOKE UP, gonna do my stuff now.
+
+        I am DONE executing the IRIS FLOW
+        
+
+    Done flow_cli.py.
+    
+[INFO] Process ended (returncode 0)
+[INFO] Finished: Run process 1.017 seconds
+[WARNING] Exit:finished; Returncode:0; Time:1.01738

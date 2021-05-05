@@ -1,6 +1,6 @@
 [SETTINGS] {
-  "date": "2021/05/05 19:16:09",
-  "date_iso": "2021-05-05T19:16:09.631645",
+  "date": "2021/05/05 19:30:04",
+  "date_iso": "2021-05-05T19:30:04.712193",
   "params": null,
   "system": {
     "nodename": "calypso.local",
@@ -11,27 +11,27 @@
     "system": "Darwin",
     "cpu_count": 8,
     "cpu_times": {
-      "user": 60451.95,
-      "system": 38560.77,
-      "idle": 1357002.74,
+      "user": 60713.8,
+      "system": 38734.36,
+      "idle": 1363247.89,
       "nice": 0.0
     },
-    "cpu_percent": 18.4,
+    "cpu_percent": 23.7,
     "virtual_memory": {
       "total": 17179869184,
-      "available": 1577287680,
-      "percent": 90.8,
-      "used": 1927503872,
-      "free": 88784896
+      "available": 1553444864,
+      "percent": 91.0,
+      "used": 1952354304,
+      "free": 59781120
     }
   },
   "process": {
     "username": "zissou",
     "cwd": "/Users/zissou/repos/affe/note/tutorial",
-    "create_time": 1620234968.743154,
+    "create_time": 1620235796.867682,
     "cpu_times": {
-      "user": 0.015041942,
-      "system": 0.003953559
+      "user": 0.030520876,
+      "system": 0.009665367
     }
   },
   "logfile": "/Users/zissou/repos/affe/note/out/GenericBenchmark/logs/logs-0000",
@@ -44,14 +44,9 @@
 
     Start flow_cli.py.
     
-[STDERR] Traceback (most recent call last):
-[STDERR]   File "/Users/zissou/repos/affe/src/affe/cli/flow_cli.py", line 69, in <module>
-[STDERR]     main(flow_filepath_outer_scope)
-[STDERR]   File "/Users/zissou/repos/affe/src/affe/cli/flow_cli.py", line 31, in main
-[STDERR]     if flow.imports_source_code is not None:
-[STDERR]   File "/Users/zissou/repos/affe/src/affe/flow/Flow.py", line 141, in imports_source_code
-[STDERR]     if self._imports_source_code is None:
-[STDERR] AttributeError: 'DTDemo' object has no attribute '_imports_source_code'
-[INFO] Process ended (returncode 1)
-[INFO] Finished: Run process 1.025 seconds
-[WARNING] Exit:finished; Returncode:1; Time:1.02517
+
+    Done flow_cli.py.
+    
+[INFO] Process ended (returncode 0)
+[INFO] Finished: Run process 1.023 seconds
+[WARNING] Exit:finished; Returncode:0; Time:1.02281
