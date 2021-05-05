@@ -108,8 +108,7 @@ class ShellExecutor(Executor):
 
 
 class ShellCommandExecutor(object):
-    """Very simple class that does not need a flow and just executes a command.
-    """
+    """Very simple class that does not need a flow and just executes a command."""
 
     def __init__(self, command):
         self.command = command

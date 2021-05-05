@@ -54,9 +54,16 @@ class Pull:
         :param msg: The actual message
         """
         if identifier >= levels.STDOUT:
-            print("{:<20} - {:<20}: {} {}".format(ts, node, level_prefix[identifier], msg), end='')
+            print(
+                "{:<20} - {:<20}: {} {}".format(
+                    ts, node, level_prefix[identifier], msg
+                ),
+                end="",
+            )
         else:
-            print("{:<20} - {:<20}: {} {}".format(ts, node, level_prefix[identifier], msg))
+            print(
+                "{:<20} - {:<20}: {} {}".format(ts, node, level_prefix[identifier], msg)
+            )
 
     def run(self):
         try:

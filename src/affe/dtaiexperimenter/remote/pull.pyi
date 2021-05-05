@@ -1,7 +1,7 @@
 from typing import Optional, Tuple, Dict, Any
 
 class Pull:
-    def __init__(self, port: int=None) -> None:
+    def __init__(self, port: int = None) -> None:
         self.socket = ...  # type: Any
         ...
     def process_msg(self, node: str, identifier: int, msg: str, ts: str) -> None: ...

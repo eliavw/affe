@@ -6,8 +6,7 @@ from .GenericBenchmark import GenericAlgorithmDemo
 
 
 class DTDemo(GenericAlgorithmDemo):
-    """This demo shows how to setup a very simple sklearn flow
-    """
+    """This demo shows how to setup a very simple sklearn flow"""
 
     algorithms = dict(default=DecisionTreeClassifier)
     analysis = dict(default=accuracy_score)
@@ -21,6 +20,11 @@ class DTDemo(GenericAlgorithmDemo):
             X, y = load_iris(return_X_y=True)
 
         # collect outgoing information
-        dataset = dict(X=X, y=y, name=dataset_id, metadata=dict(),)
+        dataset = dict(
+            X=X,
+            y=y,
+            name=dataset_id,
+            metadata=dict(),
+        )
 
         return dataset

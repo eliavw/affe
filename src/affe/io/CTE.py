@@ -1,4 +1,3 @@
-
 # Suggested Defaults
 SEPARATOR = "-"
 KEYCHAIN_SEPARATOR = "."
@@ -9,4 +8,3 @@ DEFAULT_CHILDREN = dict(
     model=["models", "logs", "timings"],
     flow=["config", "logs", "results", "models", "timings", "tmp", "flows"],
 )
-

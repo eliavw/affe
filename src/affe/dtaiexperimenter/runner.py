@@ -29,9 +29,21 @@ from .utils import levels
 from .remote.push import PushToRemote
 
 
-def run_external_binary(cmd=None, memory_limit=None, unbuffered=False, force=False, cwd=None,
-                        timeout=None, remote=None, file_limit=None, memory_available=None,
-                        hide_output=False, log_lvl=levels.INFO, logfile="testlog", **kwargs):
+def run_external_binary(
+    cmd=None,
+    memory_limit=None,
+    unbuffered=False,
+    force=False,
+    cwd=None,
+    timeout=None,
+    remote=None,
+    file_limit=None,
+    memory_available=None,
+    hide_output=False,
+    log_lvl=levels.INFO,
+    logfile="testlog",
+    **kwargs
+):
     """
     Excute a command with monitoring.
 
@@ -67,8 +79,9 @@ def run_external_binary(cmd=None, memory_limit=None, unbuffered=False, force=Fal
         else:
             host = remote
             port = None
-        monitors.append(PushToRemote(host=host, port=port,
-                                     keep_alive=True, msg_queue_size=0))
+        monitors.append(
+            PushToRemote(host=host, port=port, keep_alive=True, msg_queue_size=0)
+        )
 
     # Monitor memory usage of process
     if memory_limit is not None or memory_available is not None:
@@ -82,10 +95,14 @@ def run_external_binary(cmd=None, memory_limit=None, unbuffered=False, force=Fal
     if file_limit is not None:
         filename, filesize = file_limit.split(":")
         filesize = float(filesize)
-        monitors.append(FileSizeLimit(filename=filename, maxsize=filesize*1024*1024))
+        monitors.append(
+            FileSizeLimit(filename=filename, maxsize=filesize * 1024 * 1024)
+        )
 
     # Run the actual process with a list of monitors
-    p = Process(cmd, unbuffered=unbuffered, monitors=monitors, cwd=None, hide_output=hide_output)
+    p = Process(
+        cmd, unbuffered=unbuffered, monitors=monitors, cwd=None, hide_output=hide_output
+    )
     p.run()
 
 
@@ -95,36 +112,58 @@ def get_log_lvl(verbose=None, quiet=None, **kwargs):
         dec += verbose
     if quiet is not None:
         dec -= quiet
-    return levels.INFO-10*dec  # Default is level INFO
+    return levels.INFO - 10 * dec  # Default is level INFO
 
 
 def usage_examples(binary_name="example.py"):
-    return "\n".join([
-        "Examples:",
-        "  {} binary --memlimit=100 --timeout=300".format(binary_name),
-        "",
-        "Copyright 2017, DTAI KU Leuven, https://dtai.cs.kuleuven.be"
-    ])
+    return "\n".join(
+        [
+            "Examples:",
+            "  {} binary --memlimit=100 --timeout=300".format(binary_name),
+            "",
+            "Copyright 2017, DTAI KU Leuven, https://dtai.cs.kuleuven.be",
+        ]
+    )
 
 
 def build_parser_experimenter(parser):
-    parser.add_argument('--force', '-f', action='store_true', help='Overwrite logfile')
-    parser.add_argument('--logfile', default='testlog', help='Logfile filename')
-    parser.add_argument('--memlimit', dest='memory_limit', default=None, help='Memory limit (MiB)')
-    parser.add_argument('--memavailable', dest='memory_available', default=None,
-                        help='Minimal amount of memory that should still be available (MiB)')
-    parser.add_argument('--timeout', default=None, help="Timeout (sec)")
-    parser.add_argument('--filelimit', dest='file_limit', default=None,
-                        help="Max file size for given file. Format=filename:size_mb")
-    parser.add_argument('--remote', help="Send monitoring information to remote at this address")
-    parser.add_argument('--unbuffered', action='store_true', help='Replace pipe with pseudo-terminal')
-    parser.add_argument('--hideoutput', dest='hide_output', action='store_true',
-                        help='Do not print the subprocess output to screen')
-    parser.add_argument('--cwd', help='Current working directory')
+    parser.add_argument("--force", "-f", action="store_true", help="Overwrite logfile")
+    parser.add_argument("--logfile", default="testlog", help="Logfile filename")
+    parser.add_argument(
+        "--memlimit", dest="memory_limit", default=None, help="Memory limit (MiB)"
+    )
+    parser.add_argument(
+        "--memavailable",
+        dest="memory_available",
+        default=None,
+        help="Minimal amount of memory that should still be available (MiB)",
+    )
+    parser.add_argument("--timeout", default=None, help="Timeout (sec)")
+    parser.add_argument(
+        "--filelimit",
+        dest="file_limit",
+        default=None,
+        help="Max file size for given file. Format=filename:size_mb",
+    )
+    parser.add_argument(
+        "--remote", help="Send monitoring information to remote at this address"
+    )
+    parser.add_argument(
+        "--unbuffered", action="store_true", help="Replace pipe with pseudo-terminal"
+    )
+    parser.add_argument(
+        "--hideoutput",
+        dest="hide_output",
+        action="store_true",
+        help="Do not print the subprocess output to screen",
+    )
+    parser.add_argument("--cwd", help="Current working directory")
 
 
 def build_parser_general(parser):
-    parser.add_argument('cmd', help='Command to run', nargs='?')
-    parser.add_argument('--version', action='version', version='Experimenter ' + __version__)
-    parser.add_argument('--verbose', '-v', action='count', help='Verbose output')
-    parser.add_argument('--quiet', '-q', action='count', help='Silence output')
+    parser.add_argument("cmd", help="Command to run", nargs="?")
+    parser.add_argument(
+        "--version", action="version", version="Experimenter " + __version__
+    )
+    parser.add_argument("--verbose", "-v", action="count", help="Verbose output")
+    parser.add_argument("--quiet", "-q", action="count", help="Silence output")

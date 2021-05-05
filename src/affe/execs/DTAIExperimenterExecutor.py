@@ -54,8 +54,8 @@ class DTAIExperimenterExecutor(Executor):
 
     def set_monitors(self):
         """
-        Create monitors to monitor whatever is being executed. 
-        
+        Create monitors to monitor whatever is being executed.
+
         Default monitors are a logger and a timeout.
         """
         monitors = []
@@ -80,7 +80,10 @@ class DTAIExperimenterExecutor(Executor):
 
 class DTAIExperimenterFunctionExecutor(DTAIExperimenterExecutor):
     def __init__(
-        self, workflow, log_filepath=None, timeout_s=None,
+        self,
+        workflow,
+        log_filepath=None,
+        timeout_s=None,
     ):
         super().__init__(workflow, log_filepath=log_filepath, timeout_s=timeout_s)
         self.flow_initialized = self.set_flow_initialized()
@@ -176,8 +179,7 @@ class FunctionExecutor(DTAIExperimenterExecutor):
 
 
 class DelayedShellCommand:
-    """Mini-helper class for DTAIExperimenterShellExecutor, I need to pack a generated command in a future for it to be ran correctly by the superclass.
-    """
+    """Mini-helper class for DTAIExperimenterShellExecutor, I need to pack a generated command in a future for it to be ran correctly by the superclass."""
 
     def __init__(self, command):
         self.command = command

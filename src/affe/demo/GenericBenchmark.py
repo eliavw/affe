@@ -19,7 +19,7 @@ from ..io import (
 # Boilerplate superclass
 class GenericBenchmark(Flow):
     """Generic example of a benchmark experiment.
-    
+
     N.b.:This is an abstract class, will fail if used directly
     """
 
@@ -56,13 +56,19 @@ class GenericBenchmark(Flow):
     @staticmethod
     def get_rest_config(dataset_id="iris", **kwargs):
 
-        cfg_data = dict(dataset_id=dataset_id,)
+        cfg_data = dict(
+            dataset_id=dataset_id,
+        )
 
         cfg_analysis = dict(analysis_id="default")
 
         cfg_visuals = dict()
 
-        config = dict(data=cfg_data, analysis=cfg_analysis, visuals=cfg_visuals,)
+        config = dict(
+            data=cfg_data,
+            analysis=cfg_analysis,
+            visuals=cfg_visuals,
+        )
 
         return config
 
@@ -81,7 +87,11 @@ class GenericBenchmark(Flow):
             flow_identifier = self.flow_identifier
         # Perform duties
         fs = mimic_fs(
-            root_levels_up=root_levels_up, depth=fs_depth, exclude=frozenset(exclude_in_scan) if exclude_in_scan is not None else exclude_in_scan,
+            root_levels_up=root_levels_up,
+            depth=fs_depth,
+            exclude=frozenset(exclude_in_scan)
+            if exclude_in_scan is not None
+            else exclude_in_scan,
         )
 
         ## Build the filesystem we desire
@@ -154,7 +164,9 @@ class GenericBenchmark(Flow):
 
         # collect outgoing information
         metadata = dict(
-            dataset=dataset_name, n_features=n_features, n_instances=n_instances,
+            dataset=dataset_name,
+            n_features=n_features,
+            n_instances=n_instances,
         )
 
         if add_internal_metadata:
@@ -165,7 +177,7 @@ class GenericBenchmark(Flow):
     @staticmethod
     def get_preprocessing(dataset, random_state=42):
         """Put the data in the actionable format required by the subsequent algorithms.
-        
+
         Typically, this involves going to actual matrix form.
         """
         # collect ingoing information
@@ -239,7 +251,12 @@ class GenericAlgorithmDemo(GenericBenchmark):
         # perform duties
 
         # collect outgoing information
-        dataset = dict(X=None, y=None, name=dataset_id, metadata=dict(),)
+        dataset = dict(
+            X=None,
+            y=None,
+            name=dataset_id,
+            metadata=dict(),
+        )
 
         return dataset
 

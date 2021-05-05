@@ -27,7 +27,7 @@ def build_filesystem(root=None, levels_up=2):
                 |---logs
                 |---timings
                 |---results
-                |---config   
+                |---config
     |
     |---data
         |---raw
@@ -231,14 +231,20 @@ def filename_cli_commands(
 
 
 def filename_nodefile(
-    basename="nodefile", check=True, fs=None,
+    basename="nodefile",
+    check=True,
+    fs=None,
 ):
     # Directory name
     cli_dir = FILESYSTEM["cli"] if fs is None else fs["cli"]
 
     # File name
     filename = build_filename(
-        basename=basename, prefix="", suffix="", separator="", extension="",
+        basename=basename,
+        prefix="",
+        suffix="",
+        separator="",
+        extension="",
     )
 
     return _check_and_join(filename, cli_dir, check=check)
@@ -437,4 +443,3 @@ def experiment_suffix(qry_idx):
         else:
             suffix = build_code_string(idx=qry_idx[0], kind="query")
         return suffix
-

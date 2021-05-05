@@ -38,19 +38,25 @@ logger = logging.getLogger("be.kuleuven.cs.dtai.experimenter")
 
 def data_to_str(data, depth=0):
     if type(data) in [list, set, tuple]:
-        return "["+"; ".join([data_to_str(datum, depth+1) for datum in data])+"]"
+        return "[" + "; ".join([data_to_str(datum, depth + 1) for datum in data]) + "]"
     if type(data) == dict:
-        if depth == 0 and any([type(datum) in [list, set, tuple, dict] for datum in data.values()]):
+        if depth == 0 and any(
+            [type(datum) in [list, set, tuple, dict] for datum in data.values()]
+        ):
             return json.dumps(data, indent=2)
-        return "; ".join(["{}:{}".format(key, data_to_str(datum, depth+1)) for key, datum in data.items()])
+        return "; ".join(
+            [
+                "{}:{}".format(key, data_to_str(datum, depth + 1))
+                for key, datum in data.items()
+            ]
+        )
     if type(data) == float:
         return "{:.5f}".format(data)
     return str(data)
 
 
 class ProcessMonitor:
-    def __init__(self, interval=1, run_as_thread=False,
-                 listen_to_output=False):
+    def __init__(self, interval=1, run_as_thread=False, listen_to_output=False):
         """Class that monitors the process.
         Send a tuple (returncode, reason) to the self.stop queue to halt the process.
         The process itself is available as self.parent.
@@ -69,8 +75,7 @@ class ProcessMonitor:
     def __del__(self):
         self._tear_down(returncode=999)
 
-    def set_up(self, parent,
-               stop, output):
+    def set_up(self, parent, stop, output):
         self.active = True
         self.stop = stop
         self.parent = parent
@@ -154,23 +159,31 @@ class Logfile(ProcessMonitor):
         if self.fn is None:
             self.file = None
         else:
-            self.info('Write log to {}'.format(self.fnrunning))
-            self.file = open(self.fnrunning, 'w')
+            self.info("Write log to {}".format(self.fnrunning))
+            self.file = open(self.fnrunning, "w")
 
     def get_settings(self):
-        return {
-            "logfile": self.fn
-        }
+        return {"logfile": self.fn}
 
     def verify(self):
         if self.is_running():
-            self.warn('Skipping, running logfile exists (remove manually): {}'.format(self.fnrunning))
+            self.warn(
+                "Skipping, running logfile exists (remove manually): {}".format(
+                    self.fnrunning
+                )
+            )
             return 999, "already_running"
         if self.is_success():
             if self.force:
-                self.warn('Rerunning experiment (successful logfile did already exists: {})'.format(self.fnsuccess))
+                self.warn(
+                    "Rerunning experiment (successful logfile did already exists: {})".format(
+                        self.fnsuccess
+                    )
+                )
             else:
-                self.warn('Skipping, successful logfile exists: {}'.format(self.fnsuccess))
+                self.warn(
+                    "Skipping, successful logfile exists: {}".format(self.fnsuccess)
+                )
                 return 999, "cached_version"
         return None
 
@@ -182,15 +195,15 @@ class Logfile(ProcessMonitor):
         """
         if self.file is None:
             return
-        self.info('Closing {}'.format(self.file.name))
+        self.info("Closing {}".format(self.file.name))
         self.file.close()
         self.file = None
         if returncode is not None and returncode == 0:
             os.rename(self.fnrunning, self.fnsuccess)
-            self.info('Renamed logfile to {}'.format(self.fnsuccess))
+            self.info("Renamed logfile to {}".format(self.fnsuccess))
         else:
             os.rename(self.fnrunning, self.fnfailure)
-            self.info('Renamed logfile to {}'.format(self.fnfailure))
+            self.info("Renamed logfile to {}".format(self.fnfailure))
 
     def _set_up(self, parent):
         result = self.verify()
@@ -219,9 +232,9 @@ class Logfile(ProcessMonitor):
         if self.prefix is not None:
             msg = f"[{self.prefix}] " + msg
         if identifier >= levels.STDOUT:
-            print(level_prefix[identifier]+msg, file=self.file, end='')
+            print(level_prefix[identifier] + msg, file=self.file, end="")
         else:
-            print(level_prefix[identifier]+msg, file=self.file)
+            print(level_prefix[identifier] + msg, file=self.file)
 
 
 class Print(ProcessMonitor):
@@ -245,7 +258,7 @@ class Print(ProcessMonitor):
             msg = f"[{self.prefix}] " + msg
         if identifier >= levels.STDOUT:
             if self.include_stdout:
-                print_orig(level_prefix[identifier] + msg, file=self.stdout, end='')
+                print_orig(level_prefix[identifier] + msg, file=self.stdout, end="")
         else:
             print_orig(level_prefix[identifier] + msg, file=self.stdout)
 
@@ -266,7 +279,7 @@ class JsonFile(ProcessMonitor):
         self.first = True
 
     def _set_up(self, parent):
-        self.file = open(self.fn, 'w')
+        self.file = open(self.fn, "w")
         print("[", file=self.file)
 
     def _tear_down(self, returncode=0):
@@ -282,13 +295,13 @@ class JsonFile(ProcessMonitor):
         row = {
             "ts": datetime.datetime.utcnow().isoformat(),
             "type": level_type[identifier],
-            "values": data
+            "values": data,
         }
         if self.first:
             self.first = False
         else:
-            print(",\n", file=self.file, end='')
-        print(json.dumps(row, indent=2), file=self.file, end='')
+            print(",\n", file=self.file, end="")
+        print(json.dumps(row, indent=2), file=self.file, end="")
 
     def get_log(self, data, identifier):
         if identifier < self.log_lvl:
@@ -316,10 +329,7 @@ class MemoryLimit(ProcessMonitor):
             self.active = False
 
     def get_settings(self):
-        return {
-            "memory_limit": self.maxmem,
-            "memory_minavailable": self.minavailable
-        }
+        return {"memory_limit": self.maxmem, "memory_minavailable": self.minavailable}
 
     def verify(self):
         if not self.active:
@@ -338,7 +348,7 @@ class MemoryLimit(ProcessMonitor):
         mem_a = 0
         try:
             vm = psutil.virtual_memory()
-            mem_a = vm.available/rusage_denom
+            mem_a = vm.available / rusage_denom
             p = psutil.Process()  # psutil.Process(self.parent.p.pid)
             for child in p.children(recursive=True):
                 mem_2 += child.memory_info().rss / rusage_denom
@@ -351,24 +361,30 @@ class MemoryLimit(ProcessMonitor):
             pass
         except psutil.NoSuchProcess:
             pass
-        self.status({
-            "exp.usertime": usage.ru_utime,
-            "exp.systime": usage.ru_stime,
-            "exp.mem(MiB)": mem_1,
-            "usertime": cpu_u,
-            "systime": cpu_s,
-            "mem(MiB)": mem_2,
-            "vms(MiB)": mem_3,
-            "%mem": mem_p,
-            "%cpu": cpu_p,
-            "sys.available(MiB)": mem_a
-        })
+        self.status(
+            {
+                "exp.usertime": usage.ru_utime,
+                "exp.systime": usage.ru_stime,
+                "exp.mem(MiB)": mem_1,
+                "usertime": cpu_u,
+                "systime": cpu_s,
+                "mem(MiB)": mem_2,
+                "vms(MiB)": mem_3,
+                "%mem": mem_p,
+                "%cpu": cpu_p,
+                "sys.available(MiB)": mem_a,
+            }
+        )
         if self.maxmem is not None and self.maxmem != 0 and mem_2 > self.maxmem:
             self.warn("Memory limit reached, stopping.")
-            return 999, 'memory_limit'
-        if self.minavailable is not None and self.minavailable != 0 and mem_a < self.minavailable:
+            return 999, "memory_limit"
+        if (
+            self.minavailable is not None
+            and self.minavailable != 0
+            and mem_a < self.minavailable
+        ):
             self.warn("Not enough memory available, stopping.")
-            return 999, 'memory_low'
+            return 999, "memory_low"
         return None
 
 
@@ -390,9 +406,7 @@ class TimeLimit(ProcessMonitor):
             self.end_time = self.start_time + self.maxtime
 
     def get_settings(self):
-        return {
-            "max_time": self.maxtime
-        }
+        return {"max_time": self.maxtime}
 
     def verify(self):
         if self.maxtime is not None and time.time() > self.end_time:
@@ -411,22 +425,17 @@ class FileSizeLimit(ProcessMonitor):
         self.maxsize = maxsize
 
     def get_settings(self):
-        return {
-            "max_filesize": self.maxsize
-        }
+        return {"max_filesize": self.maxsize}
 
     def verify(self):
         try:
             if os.path.exists(self.filename):
-                size = os.path.getsize(self.filename) / (1024*1024)
-                self.status({
-                    "filename": self.filename,
-                    "filesize(MiB)": size
-                })
+                size = os.path.getsize(self.filename) / (1024 * 1024)
+                self.status({"filename": self.filename, "filesize(MiB)": size})
                 if self.maxsize is not None and size > self.maxsize:
                     return 999, "filesize_limit"
             else:
-                self.warn('filesize {}: File not found'.format(self.filename))
+                self.warn("filesize {}: File not found".format(self.filename))
         except OSError:
             return 999, "file does not exist"
         return None
@@ -441,17 +450,13 @@ class DiskSpaceLimit(ProcessMonitor):
         self.minavailable = minavailable
 
     def get_settings(self):
-        return {
-            "diskspace_minavailable": self.minavailable
-        }
+        return {"diskspace_minavailable": self.minavailable}
 
     def verify(self):
         try:
             vfs = os.statvfs("/")
-            size_available = (vfs.f_bavail * vfs.f_frsize) / (1024*1024)
-            self.status({
-                "diskspace.available(MiB)": size_available
-            })
+            size_available = (vfs.f_bavail * vfs.f_frsize) / (1024 * 1024)
+            self.status({"diskspace.available(MiB)": size_available})
             if self.minavailable is not None and size_available < self.minavailable:
                 return 999, "diskspace_low"
         except OSError:

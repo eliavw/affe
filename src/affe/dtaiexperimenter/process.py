@@ -43,7 +43,7 @@ from .utils import Timer, levels, MPStream, wait_until_queue_empty
 from . import monitor
 
 logger = logging.getLogger("be.kuleuven.cs.dtai.experimenter")
-Primitive = NewType('Primitive', Union[dict, list, tuple, str, float, int])
+Primitive = NewType("Primitive", Union[dict, list, tuple, str, float, int])
 
 
 class ProcessLogger(logging.Logger):
@@ -96,7 +96,7 @@ class ProcessBase:
         result = {}
         for arg in args:
             if arg.startswith(prefix):
-                result[arg[len(prefix):]] = args[arg]
+                result[arg[len(prefix) :]] = args[arg]
         return result
 
     def _set_up_monitors(self):
@@ -122,7 +122,7 @@ class ProcessBase:
             # for line in stream:
             try:
                 line = stream.readline()
-                if line == b'' or line == '':
+                if line == b"" or line == "":
                     continue
                 self.output.put((identifier, line))
                 if not self.stop.empty():
@@ -132,7 +132,7 @@ class ProcessBase:
             except ValueError as exc:
                 logger.warning("ValueError({}): {}".format(identifier, exc))
             # except Exception as exc:
-                # logger.warning("UnknownError({}): {}".format(identifier, exc))
+            # logger.warning("UnknownError({}): {}".format(identifier, exc))
         if stream is not None and not stream.closed:
             stream.close()
 
@@ -146,7 +146,7 @@ class ProcessBase:
                 pass
             else:
                 if type(line) is bytes:
-                    line = line.decode('utf-8')
+                    line = line.decode("utf-8")
                 self.logger.log(line, identifier)
             if not self.stop.empty() and not stop_timer.is_alive():
                 try:
@@ -172,20 +172,20 @@ class ProcessBase:
             sparams["cpu_count"] = psutil.cpu_count()
             sparams["cpu_times"] = dict()
             cpu_times = psutil.cpu_times()
-            for k in ['user', 'system', 'idle', 'nice']:
+            for k in ["user", "system", "idle", "nice"]:
                 try:
                     sparams["cpu_times"][k] = cpu_times.__getattribute__(k)
                 except AttributeError:
-                    logger.warning('Property {} cannot be retrieved'.format(k))
+                    logger.warning("Property {} cannot be retrieved".format(k))
             sparams["cpu_count"] = psutil.cpu_count()
             sparams["cpu_percent"] = psutil.cpu_percent()
             virtual_memory = psutil.virtual_memory()
             sparams["virtual_memory"] = dict()
-            for k in ['total', 'available', 'percent', 'used', 'free']:
+            for k in ["total", "available", "percent", "used", "free"]:
                 try:
                     sparams["virtual_memory"][k] = virtual_memory.__getattribute__(k)
                 except AttributeError:
-                    logger.warning('Property {} cannot be retrieved'.format(k))
+                    logger.warning("Property {} cannot be retrieved".format(k))
             params["system"] = sparams
 
             # Process
@@ -196,11 +196,11 @@ class ProcessBase:
             pparams["create_time"] = p.create_time()
             cpu_times = p.cpu_times()
             pparams["cpu_times"] = dict()
-            for k in ['user', 'system']:
+            for k in ["user", "system"]:
                 try:
                     pparams["cpu_times"][k] = cpu_times.__getattribute__(k)
                 except AttributeError:
-                    logger.warning('Property {} cannot be retrieved'.format(k))
+                    logger.warning("Property {} cannot be retrieved".format(k))
             params["process"] = pparams
 
             # Monitors
@@ -232,10 +232,12 @@ class ProcessBase:
                 self.logger.warning("No stderr is set to track")
                 # sys.exit(1)
             with Timer("Run process", self.logger) as timer:
-                watch_stdout_thread = threading.Thread(target=self._watch_stream,
-                                                       args=(levels.STDOUT, self.stdout))
-                watch_stderr_thread = threading.Thread(target=self._watch_stream,
-                                                       args=(levels.STDERR, self.stderr))
+                watch_stdout_thread = threading.Thread(
+                    target=self._watch_stream, args=(levels.STDOUT, self.stdout)
+                )
+                watch_stderr_thread = threading.Thread(
+                    target=self._watch_stream, args=(levels.STDERR, self.stderr)
+                )
                 process_stream_thread = threading.Thread(target=self._process_stream)
                 watch_stdout_thread.start()
                 watch_stderr_thread.start()
@@ -243,19 +245,21 @@ class ProcessBase:
 
                 if self.stop.empty():
                     result = self._run_execute()
-                self.logger.info('Process ended (returncode {})'.format(self.returncode))
+                self.logger.info(
+                    "Process ended (returncode {})".format(self.returncode)
+                )
 
             total_time = timer.total_time
 
         except KeyboardInterrupt:
-            self.kill(reason='keyboard')
+            self.kill(reason="keyboard")
         except Exception as exc:
             tmpout = io.StringIO()
             traceback.print_exc(file=tmpout)
             self.logger.error(tmpout.getvalue())
             tmpout.close()
-            self.logger.error('Exception: {}'.format(exc))
-            self.kill(reason='other')
+            self.logger.error("Exception: {}".format(exc))
+            self.kill(reason="other")
 
         self._run_teardown()
 
@@ -269,13 +273,15 @@ class ProcessBase:
             else:
                 self.returncode = max(c, self.returncode)
         if len(reasons) == 0:
-            reasons.append('finished')
-        self.logger.warning({
-            'Exit': ', '.join(reasons),
-            'Returncode': self.returncode,
-            'Time': total_time
-        })
-        self.stop.put((0, 'completed'))
+            reasons.append("finished")
+        self.logger.warning(
+            {
+                "Exit": ", ".join(reasons),
+                "Returncode": self.returncode,
+                "Time": total_time,
+            }
+        )
+        self.stop.put((0, "completed"))
         wait_until_queue_empty(self.output, timeout=0.5)
         self._tear_down_monitors()
         return result
@@ -314,13 +320,20 @@ class ProcessBase:
             self.stop.put((self.returncode, reason))
         else:
             if self.stop.empty():
-                self.stop.put((self.returncode, 'other'))
+                self.stop.put((self.returncode, "other"))
 
 
 class Process(ProcessBase):
-    def __init__(self, cmd, cwd=None, env=None,
-                 monitors=None, params=None,
-                 unbuffered=False, **kwdargs):
+    def __init__(
+        self,
+        cmd,
+        cwd=None,
+        env=None,
+        monitors=None,
+        params=None,
+        unbuffered=False,
+        **kwdargs
+    ):
         """
         Create a process to run an external binary.
 
@@ -353,7 +366,7 @@ class Process(ProcessBase):
         self.unbuffered = unbuffered
 
         if self.unbuffered:
-            self.logger.info('Opening pseudo-terminal')
+            self.logger.info("Opening pseudo-terminal")
             self.stdout_master, self.stdout_slave = pty.openpty()
             self.stderr_master, self.stderr_slave = pty.openpty()
             self.stdout_pipe = self.stdout_slave
@@ -365,11 +378,12 @@ class Process(ProcessBase):
             self.stderr_pipe = sp.PIPE
 
         self.popen_args = {
-            'stderr': self.stderr_pipe,
-            'stdout': self.stdout_pipe,
-            'cwd': self.cwd,
-            'env': self.env}
-        self.popen_args.update(self._extract_arguments(kwdargs, 'popen_'))
+            "stderr": self.stderr_pipe,
+            "stdout": self.stdout_pipe,
+            "cwd": self.cwd,
+            "env": self.env,
+        }
+        self.popen_args.update(self._extract_arguments(kwdargs, "popen_"))
 
     def __del__(self):
         self.kill()
@@ -380,7 +394,7 @@ class Process(ProcessBase):
         super()._tear_down_monitors()
 
     def _run_setup(self):
-        self.logger.info({'cmd': ' '.join(self.cmd), 'cwd': self.cwd})
+        self.logger.info({"cmd": " ".join(self.cmd), "cwd": self.cwd})
         try:
             self.p = sp.Popen(self.cmd, **self.popen_args)
         except FileNotFoundError as exc:
@@ -406,7 +420,7 @@ class Process(ProcessBase):
 
     def _run_teardown(self):
         if self.unbuffered:
-            self.logger.info('Closing pseudo-terminal')
+            self.logger.info("Closing pseudo-terminal")
             if self.stdout is not None and not self.stdout.closed:
                 self.stdout.close()
             if self.stderr is not None and not self.stderr.closed:
@@ -418,34 +432,38 @@ class Process(ProcessBase):
 
     def get_characteristics(self):
         params = super().get_characteristics()
-        params["command"] = ' '.join(self.cmd)
+        params["command"] = " ".join(self.cmd)
         return params
 
     def kill(self, reason=None, returncode=None):
         super().kill(reason=reason, returncode=returncode)
         if self.p is not None and self.p.poll() is None:
-            if reason is not None and reason != '':
-                reason = ' ({})'.format(reason)
+            if reason is not None and reason != "":
+                reason = " ({})".format(reason)
             else:
-                reason = ''
-            self.logger.info('Kill process{}'.format(reason))
+                reason = ""
+            self.logger.info("Kill process{}".format(reason))
             procs = psutil.Process(self.p.pid).children(recursive=True)
             for p in procs:
                 p.terminate()
 
             def on_terminate(proc):
-                self.logger.info("Process {} terminated with exit code {}".format(proc, proc.returncode))
+                self.logger.info(
+                    "Process {} terminated with exit code {}".format(
+                        proc, proc.returncode
+                    )
+                )
 
-            gone, still_alive = psutil.wait_procs(procs, timeout=3, callback=on_terminate)
+            gone, still_alive = psutil.wait_procs(
+                procs, timeout=3, callback=on_terminate
+            )
             for p in still_alive:
                 p.kill()
             self.p.kill()
 
 
 class Function(ProcessBase):
-    def __init__(self, target, args=(),
-                 monitors=None, params=None,
-                 **kwdargs):
+    def __init__(self, target, args=(), monitors=None, params=None, **kwdargs):
         """
         Create a process to run a function. This is run through a
         multiprocessing.Process and has the same requirements for target
@@ -463,7 +481,7 @@ class Function(ProcessBase):
         self.p = None  # type: Optional[mp.Process]
         self.result = None
         self.process_args = {}
-        self.process_args.update(self._extract_arguments(kwdargs, 'process_'))
+        self.process_args.update(self._extract_arguments(kwdargs, "process_"))
 
     def _run_setup(self):
         self.stdout = MPStream()
@@ -476,9 +494,14 @@ class Function(ProcessBase):
                 sys.stderr = stderr
                 result = target(*args, **kwargs)
                 results.put(result)
+
             return wrapper
-        self.p = mp.Process(target=wrap(self.target, self.stdout, self.stderr, self.result),
-                            args=self.args, **self.process_args)
+
+        self.p = mp.Process(
+            target=wrap(self.target, self.stdout, self.stderr, self.result),
+            args=self.args,
+            **self.process_args
+        )
 
     def _run_execute(self):
         result = None
@@ -526,18 +549,18 @@ class Function(ProcessBase):
         params = super().get_characteristics()
         params["function"] = {
             "target": str(self.target),
-            "args": [str(arg) for arg in self.args]
+            "args": [str(arg) for arg in self.args],
         }
         return params
 
     def kill(self, reason=None, returncode=None):
         super().kill(reason=reason, returncode=returncode)
         if self.p is not None and self.p.is_alive():
-            if reason is not None and reason != '':
-                reason = ' ({})'.format(reason)
+            if reason is not None and reason != "":
+                reason = " ({})".format(reason)
             else:
-                reason = ''
-            self.logger.info('Kill process ({}){}'.format(self.p.pid, reason))
+                reason = ""
+            self.logger.info("Kill process ({}){}".format(self.p.pid, reason))
             parent = psutil.Process(self.p.pid)
             procs = parent.children(recursive=True)
             procs += [parent]
@@ -545,9 +568,15 @@ class Function(ProcessBase):
                 p.terminate()
 
             def on_terminate(proc):
-                self.logger.info("Process {} terminated with exit code {}".format(proc, proc.returncode))
+                self.logger.info(
+                    "Process {} terminated with exit code {}".format(
+                        proc, proc.returncode
+                    )
+                )
 
-            gone, still_alive = psutil.wait_procs(procs, timeout=3, callback=on_terminate)
+            gone, still_alive = psutil.wait_procs(
+                procs, timeout=3, callback=on_terminate
+            )
             for p in still_alive:
                 p.kill()
             self.p.terminate()

@@ -37,9 +37,9 @@ logger = logging.getLogger("be.kuleuven.cs.dtai.experimenter")
 
 
 class PushToRemote(ProcessMonitor):
-    def __init__(self, host=None, port=None,
-                 keep_alive=None, msg_queue_size=None,
-                 tunnel=None):
+    def __init__(
+        self, host=None, port=None, keep_alive=None, msg_queue_size=None, tunnel=None
+    ):
         """A monitor that sends the information messages (no stdin or stdout)
         to a remote listener.
         :param host: ip address of instance where the listener is running.
@@ -92,8 +92,15 @@ class PushToRemote(ProcessMonitor):
             self.socket.set_hwm(self.msg_queue_size)
         if self.tunnel is not None:
             from zmq import ssh
-            self.info("Subscribe to {}:{} over server {}".format(self.host, self.port, self.tunnel))
-            ssh.tunnel_connection(self.socket, "tcp://{}:{}".format(self.host, self.port), self.tunnel)
+
+            self.info(
+                "Subscribe to {}:{} over server {}".format(
+                    self.host, self.port, self.tunnel
+                )
+            )
+            ssh.tunnel_connection(
+                self.socket, "tcp://{}:{}".format(self.host, self.port), self.tunnel
+            )
         else:
             self.info("Subscribe to {}:{}".format(self.host, self.port))
             self.socket.connect("tcp://{}:{}".format(self.host, self.port))
@@ -105,7 +112,7 @@ class PushToRemote(ProcessMonitor):
 
     def get_log(self, msg, identifier):
         if self.socket is None:
-            logger.info('No socket connected')
+            logger.info("No socket connected")
         else:
             if identifier <= levels.CRITICAL and not self.socket.closed:
                 ts = datetime.datetime.now().isoformat()
@@ -113,10 +120,14 @@ class PushToRemote(ProcessMonitor):
                     # result of poll is 0=can't write, 2=can write
                     # result = self.socket.poll(timeout=1000, flags=3)  # get_log should not block
                     # print(result, msg)
-                    self.socket.send_json([self.unique_node, identifier, msg, ts], flags=zmq.NOBLOCK)
+                    self.socket.send_json(
+                        [self.unique_node, identifier, msg, ts], flags=zmq.NOBLOCK
+                    )
                 except zmq.error.Again as exc:
                     # Message cannot be delivered
-                    logger.warning("Cannot send information to remote viewer ({})".format(exc))
+                    logger.warning(
+                        "Cannot send information to remote viewer ({})".format(exc)
+                    )
                 except zmq.error.ZMQError as exc:
                     logger.warning("Problem connecting with remote ({})".format(exc))
                 except Exception as exc:

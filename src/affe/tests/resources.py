@@ -11,11 +11,16 @@ from ..io import (
 
 from ..flow import Flow
 
+
 def get_dummy_fs():
     root_dir = get_root_directory()
     flow_dir = get_flow_directory(keyword="flow")
 
-    dummy_fs = insert_subdirectory(root_dir, parent="out", child=flow_dir,)
+    dummy_fs = insert_subdirectory(
+        root_dir,
+        parent="out",
+        child=flow_dir,
+    )
     return dummy_fs
 
 
@@ -73,11 +78,13 @@ def get_dummy_flow(message="hi", content=dict(a=1, b=2), timeout_s=20):
     # flow-object
     logs_directory_key = "out.flow.logs"
     check_existence_of_directory(dummy_fs, logs_directory_key)
-    log_filepath = abspath(dummy_fs, logs_directory_key, "logfile"+message)
+    log_filepath = abspath(dummy_fs, logs_directory_key, "logfile" + message)
 
     flows_directory_key = "out.flow.flows"
     check_existence_of_directory(dummy_fs, flows_directory_key)
-    flow_filepath = abspath(dummy_fs, flows_directory_key, "flowfile-{}.pkl".format(message))
+    flow_filepath = abspath(
+        dummy_fs, flows_directory_key, "flowfile-{}.pkl".format(message)
+    )
 
     f = Flow(
         config=dummy_config,

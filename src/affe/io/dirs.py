@@ -7,13 +7,15 @@ from .tree import tree_path_abs, get_children
 from .utils import get_code_string
 from ..utils import flatten_dict, keychain
 
-DEFAULT_EXCLUDE = frozenset(["note", "notebooks", "notebook", "src", "docs", "tests", "visualisation"])
+DEFAULT_EXCLUDE = frozenset(
+    ["note", "notebooks", "notebook", "src", "docs", "tests", "visualisation"]
+)
 
 
 # Tree creation from filesystem
 @lru_cache(maxsize=None)
 def mimic_fs(
-        root=None, root_levels_up=2, exclude=None, depth=1, flatten=True, rename_root=None
+    root=None, root_levels_up=2, exclude=None, depth=1, flatten=True, rename_root=None
 ):
     # get the root directory
     if root is None:
@@ -92,16 +94,16 @@ def get_directory(root=None, children=None, root_levels_up=0):
 
 # Tree modification
 def insert_new_subdirectory(
-        tree,
-        parent="root",
-        child="",
-        code_string=False,
-        return_key=False,
-        **code_string_kwargs,
+    tree,
+    parent="root",
+    child="",
+    code_string=False,
+    return_key=False,
+    **code_string_kwargs,
 ):
     """
     Insert a new subdirectory entry in the given directory tree.
-    
+
     This new subdirectory has no children.
     """
     assert isinstance(child, str)
@@ -125,16 +127,16 @@ def insert_new_subdirectory(
 
 
 def insert_old_subdirectory(
-        tree,
-        parent="root",
-        child=None,
-        code_string=False,
-        return_key=False,
-        **code_string_kwargs,
+    tree,
+    parent="root",
+    child=None,
+    code_string=False,
+    return_key=False,
+    **code_string_kwargs,
 ):
     """
     Insert an existing subdirectory tree in the given directory tree.
-    
+
     This new subdirectory has children as defined by its own tree
     """
     assert isinstance(child, dict)
@@ -167,12 +169,12 @@ def insert_old_subdirectory(
 
 
 def insert_subdirectory(
-        tree,
-        parent="root",
-        child=None,
-        code_string=False,
-        return_key=False,
-        **code_string_kwargs,
+    tree,
+    parent="root",
+    child=None,
+    code_string=False,
+    return_key=False,
+    **code_string_kwargs,
 ):
     actions = {}
     actions[str] = insert_new_subdirectory
@@ -215,7 +217,7 @@ def check_existence_of_directory(tree, nodes=None):
 
     for node in nodes:
         assert (
-                node in tree.keys()
+            node in tree.keys()
         ), "You are asking for the existence of a directory unknown to this tree"
 
         path = tree_path_abs(tree, node)
@@ -257,8 +259,7 @@ def get_root_directory(root=None, children=None, root_levels_up=2):
 
 
 def get_flow_directory(keyword="manual", children=None, root_levels_up=2):
-    """Get a tree structure that represents a typical flow directory
-    """
+    """Get a tree structure that represents a typical flow directory"""
     if children is None:
         children = DEFAULT_CHILDREN.get("flow")
 

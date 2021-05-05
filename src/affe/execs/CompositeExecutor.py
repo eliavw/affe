@@ -65,8 +65,7 @@ class CompositeExecutor(Executor):
             ).execute()
 
     def get_command_child(self, child_index=0, **kwargs):
-        """Child executor should obviously be compatible with the get_command method.
-        """
+        """Child executor should obviously be compatible with the get_command method."""
         return self.child_executor(
             self.child_workflows[child_index], **kwargs
         ).get_command()
@@ -127,7 +126,8 @@ class GNUParallelExecutor(object):
 
     # You need shell commands from your children flows, so there's two ways of extracting them.
     extractors = dict(
-        shell_now=ShellExecutor, shell_log_autonomous=DTAIExperimenterShellExecutor,
+        shell_now=ShellExecutor,
+        shell_log_autonomous=DTAIExperimenterShellExecutor,
     )
 
     def __init__(

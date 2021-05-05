@@ -8,8 +8,7 @@ import numpy as np
 
 # Interface Methods
 def save_object(o, fn):
-    """Alias for dump object method.
-    """
+    """Alias for dump object method."""
     return dump_object(o, fn)
 
 
@@ -105,6 +104,7 @@ def _load_toml(fn):
     with open(fn, "r") as f:
         o = toml.load(f)
     return o
+
 
 def _load_npy(fn):
     return np.load(fn)

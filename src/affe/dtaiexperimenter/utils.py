@@ -44,18 +44,20 @@ class Bunch(object):
         self.__dict__.update(kwargs)
 
 
-levels = Bunch({
-    "STDERR": 70,
-    "STDOUT": 60,
-    "CRITICAL": logging.CRITICAL,  # 50
-    "ERROR": logging.ERROR,        # 40
-    "WARNING": logging.WARNING,    # 30
-    "STATUS": 25,
-    "INFO": logging.INFO,          # 20
-    "SETTINGS": 15,
-    "DEBUG": logging.DEBUG,        # 10
-    "NOTSET": logging.NOTSET       # 0
-})
+levels = Bunch(
+    {
+        "STDERR": 70,
+        "STDOUT": 60,
+        "CRITICAL": logging.CRITICAL,  # 50
+        "ERROR": logging.ERROR,  # 40
+        "WARNING": logging.WARNING,  # 30
+        "STATUS": 25,
+        "INFO": logging.INFO,  # 20
+        "SETTINGS": 15,
+        "DEBUG": logging.DEBUG,  # 10
+        "NOTSET": logging.NOTSET,  # 0
+    }
+)
 
 level_prefix = {
     70: "[STDERR] ",
@@ -67,7 +69,7 @@ level_prefix = {
     levels.INFO: "[INFO] ",
     levels.SETTINGS: "[SETTINGS] ",
     levels.DEBUG: "[DEBUG] ",
-    levels.NOTSET: ""
+    levels.NOTSET: "",
 }
 
 
@@ -81,7 +83,7 @@ level_type = {
     levels.INFO: "INFO",
     levels.SETTINGS: "SETTINGS",
     levels.DEBUG: "DEBUG",
-    levels.NOTSET: "NOTSET"
+    levels.NOTSET: "NOTSET",
 }
 
 
@@ -91,7 +93,7 @@ class Timeout(Exception):
 
 
 class Timer:
-    def __init__(self, description, logger, time_format='{:.3f} seconds', max_time=0):
+    def __init__(self, description, logger, time_format="{:.3f} seconds", max_time=0):
         # Use max_time to set a timeout => If two timers with timeouts are nested the outer one will not time out.
         self._description = description
         self._logger = logger
@@ -108,18 +110,25 @@ class Timer:
 
     def __enter__(self):
         self._start_time = time.time()
-        self._logger.info('Start: '+self._description)
+        self._logger.info("Start: " + self._description)
         return self
 
     def __exit__(self, *args):
         self._exec_time = time.time() - self._start_time
-        self._logger.info('Finished: '+self._description+" "+(self._time_format.format(self._exec_time)))
+        self._logger.info(
+            "Finished: "
+            + self._description
+            + " "
+            + (self._time_format.format(self._exec_time))
+        )
         if self._max_time > 0:
             signal.setitimer(signal.ITIMER_REAL, 0)
 
     def on_time_out(self, *args):
-        self._logger.info('Execution timed out')
-        raise Timeout("TimeOut during execution of '{} ({})'".format(self._description, args))
+        self._logger.info("Execution timed out")
+        raise Timeout(
+            "TimeOut during execution of '{} ({})'".format(self._description, args)
+        )
 
 
 orig_stdout = sys.stdout
@@ -147,13 +156,12 @@ def wait_until_queue_empty(queue, timeout=1):
 # mp.set_start_method('spawn')  # should be protected by __main__
 
 
-
 class MPStream(MPQueue):
     def __init__(self, *args, **kwargs):
-        ctx = mp.get_context('spawn')
+        ctx = mp.get_context("spawn")
         super().__init__(*args, ctx=ctx, **kwargs)
         # Queue.__init__(self, *args, ctx=self.get_context(), **kwargs)
-        self.line = ''
+        self.line = ""
         self.closed = False
 
     def close_queue(self):
@@ -182,11 +190,11 @@ class MPStream(MPQueue):
                     self.line += line
                 else:
                     found_newline = True
-                    result = self.line + line[:idx+1]
-                    self.line = line[idx+1:]
+                    result = self.line + line[: idx + 1]
+                    self.line = line[idx + 1 :]
             except Empty:
                 found_newline = True
-                result = ''
+                result = ""
         return result
 
     def wait_until_empty(self, timeout=5):

@@ -28,7 +28,9 @@ class Scheduler(Flow):
             commands = [f.get_shell_command(**kwargs) for f in flows]
         return commands
 
-    def get_executor_config(self,):
+    def get_executor_config(
+        self,
+    ):
         command = get_command(
             executable="python",
             n_flows=1,
@@ -56,4 +58,3 @@ class Scheduler(Flow):
         """.format(
             n_flows, n_jobs, omp_num_threads, executable, cli, flow_filepath
         )
-
