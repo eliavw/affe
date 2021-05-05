@@ -1,6 +1,9 @@
 # output files
 out/*
 
+#macos
+*.DS_Store
+
 # Binaries
 *.pkl
 
