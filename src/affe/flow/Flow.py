@@ -35,8 +35,8 @@ class Flow:
         `direct`:   Stderr and stdout go as default
         `logged`:   Stderr and stdout are collected in a logfile.
 
-        `command`:  
-    
+        `command`:
+
     Returns:
         [type] -- [description]
     """
@@ -46,7 +46,7 @@ class Flow:
         shell_now=ShellExecutor,
         local_log=DTAIExperimenterFunctionExecutor,
         shell_log=DTAIExperimenterProcessExecutor,
-        shell_log_autonomous=DTAIExperimenterShellExecutor, 
+        shell_log_autonomous=DTAIExperimenterShellExecutor,
     )
 
     def __init__(
@@ -103,9 +103,10 @@ class Flow:
         return e.execute(return_log_filepath=return_log_filepath)
 
     def run_via_shell_with_log(self, return_log_filepath=True, **kwargs):
-        """Synonym to method above.
-        """
-        return self.run_with_log_via_shell(return_log_filepath=return_log_filepath, **kwargs)
+        """Synonym to method above."""
+        return self.run_with_log_via_shell(
+            return_log_filepath=return_log_filepath, **kwargs
+        )
 
     def get_shell_command(self, **kwargs):
         e = self.executors.get("shell_now")(self, **kwargs)

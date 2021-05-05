@@ -1,5 +1,6 @@
 import inspect
 
+
 def _find_offset_and_line_of_definition(lines):
     for l_idx, l in enumerate(lines):
         function_definition_offset = l.find("def ")
@@ -25,4 +26,3 @@ def extract_source_of_function(f, tabsize=4):
 
     inner_source = "\n".join(inner_lines)
     return inner_source
-
