@@ -1,6 +1,6 @@
 [SETTINGS] {
-  "date": "2021/05/05 20:25:20",
-  "date_iso": "2021-05-05T20:25:20.398840",
+  "date": "2021/05/05 21:10:18",
+  "date_iso": "2021-05-05T21:10:18.545772",
   "params": null,
   "system": {
     "nodename": "calypso.local",
@@ -11,27 +11,27 @@
     "system": "Darwin",
     "cpu_count": 8,
     "cpu_times": {
-      "user": 61753.53,
-      "system": 39470.65,
-      "idle": 1387998.17,
+      "user": 62834.2,
+      "system": 40251.24,
+      "idle": 1407723.15,
       "nice": 0.0
     },
-    "cpu_percent": 8.8,
+    "cpu_percent": 57.6,
     "virtual_memory": {
       "total": 17179869184,
-      "available": 1563189248,
-      "percent": 90.9,
-      "used": 1890095104,
-      "free": 64049152
+      "available": 1494482944,
+      "percent": 91.3,
+      "used": 1898029056,
+      "free": 53084160
     }
   },
   "process": {
     "username": "zissou",
     "cwd": "/Users/zissou/repos/affe/note/tutorial",
-    "create_time": 1620239105.486916,
+    "create_time": 1620241806.732208,
     "cpu_times": {
-      "user": 0.030521856,
-      "system": 0.010022798
+      "user": 0.02844728,
+      "system": 0.009865137
     }
   },
   "logfile": "logs/timeout-insufficient",
@@ -43,5 +43,5 @@
 [INFO] Write log to logs/timeout-insufficient.running.log
 [INFO] Kill process
 [INFO] Process ended (returncode None)
-[INFO] Finished: Run process 10.236 seconds
-[WARNING] Exit:time_limit; Returncode:999; Time:10.23585
+[INFO] Finished: Run process 10.204 seconds
+[WARNING] Exit:time_limit; Returncode:999; Time:10.20398

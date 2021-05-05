@@ -48,7 +48,6 @@ class Flow:
         shell_log=DTAIExperimenterProcessExecutor,
         shell_log_autonomous=DTAIExperimenterShellExecutor,
     )
-
     executioners = executors
 
     def __init__(
@@ -69,8 +68,10 @@ class Flow:
         self.config = config
 
         # If you provide python function directly, affe handles that.
-        self.imports_source_code = imports
-        self.flow_source_code = flow
+        if flow is not None:
+            self.flow = flow
+        if imports is not None:
+            self.imports = imports
         return
 
     # All things execution
@@ -131,25 +132,4 @@ class Flow:
 
         dump_object(self, self.flow_filepath)
         self.dumped = True
-        return
-
-    # Properties
-    @property
-    def imports_source_code(self):
-        return getattr(self, "_imports_source_code", None)
-
-    @imports_source_code.setter
-    def imports_source_code(self, imports_function):
-        if imports_function is not None:
-            self._imports_source_code = extract_source_of_function(imports_function)
-        return
-
-    @property
-    def flow_source_code(self):
-        return getattr(self, "_flow_source_code", None)
-
-    @flow_source_code.setter
-    def flow_source_code(self, flow_function):
-        if flow_function is not None:
-            self._flow_source_code = extract_source_of_function(flow_function)
         return

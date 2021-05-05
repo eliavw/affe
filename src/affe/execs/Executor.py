@@ -16,7 +16,8 @@ class Executor(object):
         if getattr(workflow, "flow", None) is not None:
             return workflow.flow
         elif getattr(workflow, "flow_source_code", None) is not None:
-            f = exec(workflow.flow)
+            print(workflow.flow_source_code)
+            f = exec(workflow.flow_source_code)
             return f
         else:
             raise ValueError(
