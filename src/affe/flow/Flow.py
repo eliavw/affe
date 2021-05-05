@@ -58,6 +58,7 @@ class Flow:
         flow_filepath="flowfile.pkl",
         timeout_s=60,
     ):
+        # Basics
         self.log_filepath = log_filepath
         self.flow_filepath = flow_filepath
         self.timeout_s = timeout_s
@@ -67,20 +68,7 @@ class Flow:
 
         # Manage imports
         self.imports = imports
-        if self.imports is not None:
-            self.imports_source_code = extract_source_of_function(self.imports)
-        else:
-            self.imports_source_code = None
-
-        # Manage flows
-        if flow is not None:
-            self.flow = flow
-
-        if self.flow is not None:
-            self.flow_source_code = extract_source_of_function(self.flow)
-        else:
-            self.flow_source_code = None
-
+        self.flow = flow
         return
 
     def execute(self):
@@ -130,3 +118,21 @@ class Flow:
         dump_object(self, self.flow_filepath)
         self.dumped = True
         return
+
+    @property
+    def imports_source_code(self):
+        if self._imports_source_code is None:
+            if self.imports is not None:
+                self._imports_source_code = extract_source_of_function(self.imports)
+            else:
+                self._imports_source_code = None
+        return self._imports_source_code
+
+    @property
+    def flow_source_code(self):
+        if self._flow_source_code is None:
+            if self.flow is not None:
+                self._flow_source_code = extract_source_of_function(self.flow)
+            else:
+                self._flow_source_code = None
+        return self._flow_source_code
