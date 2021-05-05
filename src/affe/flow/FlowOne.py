@@ -11,7 +11,9 @@ class FlowOne(Flow):
         self.root_levels_up = root_levels_up
         self.out_dp = out_dp
 
-        super().__init__(log_filepath=self.log_fp, flow_filepath=self.flow_fp, **kwargs)
+        super().__init__(
+            log_filepath=str(self.log_fp), flow_filepath=str(self.flow_fp), **kwargs
+        )
         return
 
     # Bookkeeping
@@ -68,11 +70,11 @@ class FlowOne(Flow):
         return self.out_dp / "log"
 
     @property
-    def _flow_fp(self):
+    def flow_fp(self):
         """Flow filepath"""
         return self._flow_dp / (self.identifier + ".pkl")
 
     @property
-    def _log_fp(self):
+    def log_fp(self):
         """Log filepath"""
         return self._log_dp / self.identifier
