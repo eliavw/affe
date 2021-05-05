@@ -4,13 +4,9 @@ channels:
   - conda-forge
   - pytorch
 dependencies:
+  - pip
   - pytest
   - jupyterlab
-  - mkdocs
-  - mkdocs-material
-  - pygments
   - pip:
       - semantic-version
-      - mkdocs-minify-plugin
-      - pymdown-extensions
       - nb-black

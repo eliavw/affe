@@ -5,8 +5,8 @@ from ..cli import get_scheduler_cli
 
 class Scheduler(Flow):
     def __init__(self, workflows):
-        flow_commands = get_flow_commands()
-        exec_config = get_executor_config()
+        self.flow_commands = self.get_flow_commands()
+        self.exec_config = self.get_executor_config()
 
         return
 
@@ -31,7 +31,7 @@ class Scheduler(Flow):
     def get_executor_config(
         self,
     ):
-        command = get_command(
+        command = self.get_command(
             executable="python",
             n_flows=1,
             n_jobs=2,
@@ -39,10 +39,9 @@ class Scheduler(Flow):
             cli=None,
             flow_filepath=None,
         )
+        return dict(command=command)
 
-        executor_config = dict(command=command)
-        return
-
+    @staticmethod
     def get_command(
         executable="python",
         n_flows=1,
