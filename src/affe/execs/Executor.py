@@ -12,6 +12,16 @@ class Executor(object):
         self.config = workflow.config
         return
 
+    def extract_flow(self, workflow):
+        if getattr(workflow, "flow", None) is not None:
+            return workflow.flow
+        elif getattr(workflow, "flow_source_code", None) is not None:
+            return exec(workflow.flow)
+        else:
+            raise ValueError(
+                "No flow method, nor flow source code found in this workflow."
+            )
+
     def execute(self, **kwargs):
         raise NotImplementedError("Not implemented in abstract base class.")
 
