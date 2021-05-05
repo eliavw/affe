@@ -49,6 +49,8 @@ class Flow:
         shell_log_autonomous=DTAIExperimenterShellExecutor,
     )
 
+    executioners = executors
+
     def __init__(
         self,
         config=None,
@@ -67,10 +69,13 @@ class Flow:
         self.config = config
 
         # Flows and Imports are python-functions
-        self.imports = imports
-        self.flow = flow
+        if imports is not None:
+            self.imports = imports
+        if flow is not None:
+            self.flow = flow
         return
 
+    # All things execution
     def execute(self):
         e = self.executors.get("local_now")(self)
         return e.execute()
@@ -90,9 +95,19 @@ class Flow:
         e = self.executors.get("shell_log")(self, **kwargs)
         return e.execute(return_log_filepath=return_log_filepath)
 
+    def run_with_log_via_shell_autonomous(self, return_log_filepath=True, **kwargs):
+        e = self.executors.get("shell_log_autonomous")(self, **kwargs)
+        return e.execute(return_log_filepath=return_log_filepath)
+
     def run_via_shell_with_log(self, return_log_filepath=True, **kwargs):
         """Synonym to method above."""
         return self.run_with_log_via_shell(
+            return_log_filepath=return_log_filepath, **kwargs
+        )
+
+    def run_via_shell_with_log_autonomous(self, return_log_filepath=True, **kwargs):
+        """Synonym to method above."""
+        return self.run_with_log_via_shell_autonomous(
             return_log_filepath=return_log_filepath, **kwargs
         )
 
@@ -105,6 +120,7 @@ class Flow:
         e = self.executors.get("shell_log_autonomous")(self, **kwargs)
         return e.command
 
+    # Persistence (Load + Dump)
     @classmethod
     def load(cls, fn):
         with open(fn, "rb") as f:
@@ -119,9 +135,10 @@ class Flow:
         self.dumped = True
         return
 
+    # Properties
     @property
     def imports_source_code(self):
-        if self._imports_source_code is None:
+        if getattr(self, "_imports_source_code", None) is None:
             if self.imports is not None:
                 self._imports_source_code = extract_source_of_function(self.imports)
             else:
@@ -130,7 +147,7 @@ class Flow:
 
     @property
     def flow_source_code(self):
-        if self._flow_source_code is None:
+        if getattr(self, "_flow_source_code", None) is None:
             if self.flow is not None:
                 self._flow_source_code = extract_source_of_function(self.flow)
             else:

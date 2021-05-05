@@ -1,0 +1,57 @@
+[SETTINGS] {
+  "date": "2021/05/05 19:16:09",
+  "date_iso": "2021-05-05T19:16:09.631645",
+  "params": null,
+  "system": {
+    "nodename": "calypso.local",
+    "machine": "x86_64",
+    "platform": "macOS-10.16-x86_64-i386-64bit",
+    "processor": "i386",
+    "version": "Darwin Kernel Version 20.4.0: Fri Mar  5 01:14:02 PST 2021; root:xnu-7195.101.1~3/RELEASE_ARM64_T8101",
+    "system": "Darwin",
+    "cpu_count": 8,
+    "cpu_times": {
+      "user": 60451.95,
+      "system": 38560.77,
+      "idle": 1357002.74,
+      "nice": 0.0
+    },
+    "cpu_percent": 18.4,
+    "virtual_memory": {
+      "total": 17179869184,
+      "available": 1577287680,
+      "percent": 90.8,
+      "used": 1927503872,
+      "free": 88784896
+    }
+  },
+  "process": {
+    "username": "zissou",
+    "cwd": "/Users/zissou/repos/affe/note/tutorial",
+    "create_time": 1620234968.743154,
+    "cpu_times": {
+      "user": 0.015041942,
+      "system": 0.003953559
+    }
+  },
+  "logfile": "/Users/zissou/repos/affe/note/out/GenericBenchmark/logs/logs-0000",
+  "max_time": 60.0,
+  "command": "/opt/miniconda3/envs/affe/bin/python /Users/zissou/repos/affe/src/affe/cli/flow_cli.py -f /Users/zissou/repos/affe/note/out/GenericBenchmark/flows/flows-0000.pkl"
+}
+[INFO] cmd:/opt/miniconda3/envs/affe/bin/python /Users/zissou/repos/affe/src/affe/cli/flow_cli.py -f /Users/zissou/repos/affe/note/out/GenericBenchmark/flows/flows-0000.pkl; cwd:/Users/zissou/repos/affe/note/tutorial
+[INFO] Start: Run process
+[INFO] Write log to /Users/zissou/repos/affe/note/out/GenericBenchmark/logs/logs-0000.running.log
+
+    Start flow_cli.py.
+    
+[STDERR] Traceback (most recent call last):
+[STDERR]   File "/Users/zissou/repos/affe/src/affe/cli/flow_cli.py", line 69, in <module>
+[STDERR]     main(flow_filepath_outer_scope)
+[STDERR]   File "/Users/zissou/repos/affe/src/affe/cli/flow_cli.py", line 31, in main
+[STDERR]     if flow.imports_source_code is not None:
+[STDERR]   File "/Users/zissou/repos/affe/src/affe/flow/Flow.py", line 141, in imports_source_code
+[STDERR]     if self._imports_source_code is None:
+[STDERR] AttributeError: 'DTDemo' object has no attribute '_imports_source_code'
+[INFO] Process ended (returncode 1)
+[INFO] Finished: Run process 1.025 seconds
+[WARNING] Exit:finished; Returncode:1; Time:1.02517

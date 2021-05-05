@@ -1,0 +1,47 @@
+{
+    "algo": {
+        "algorithm_id": "default"
+    },
+    "analysis": {
+        "analysis_id": "default"
+    },
+    "data": {
+        "dataset_id": "iris"
+    },
+    "io": {
+        "flow_directory_paths": {
+            "config": "/Users/zissou/repos/affe/note/out/GenericBenchmark/config",
+            "flows": "/Users/zissou/repos/affe/note/out/GenericBenchmark/flows",
+            "logs": "/Users/zissou/repos/affe/note/out/GenericBenchmark/logs",
+            "models": "/Users/zissou/repos/affe/note/out/GenericBenchmark/models",
+            "results": "/Users/zissou/repos/affe/note/out/GenericBenchmark/results",
+            "timings": "/Users/zissou/repos/affe/note/out/GenericBenchmark/timings",
+            "tmp": "/Users/zissou/repos/affe/note/out/GenericBenchmark/tmp"
+        },
+        "flow_filenames_paths": {
+            "config": "/Users/zissou/repos/affe/note/out/GenericBenchmark/config/config-0000.json",
+            "flows": "/Users/zissou/repos/affe/note/out/GenericBenchmark/flows/flows-0000.pkl",
+            "logs": "/Users/zissou/repos/affe/note/out/GenericBenchmark/logs/logs-0000",
+            "results": "/Users/zissou/repos/affe/note/out/GenericBenchmark/results/results-0000.pkl",
+            "timings": "/Users/zissou/repos/affe/note/out/GenericBenchmark/timings/timings-0000.csv"
+        },
+        "flow_id": 0,
+        "flow_key": "out.GenericBenchmark",
+        "fs": {
+            "deploy": "root",
+            "out": "root",
+            "out.GenericBenchmark": "out",
+            "out.GenericBenchmark.config": "out.GenericBenchmark",
+            "out.GenericBenchmark.flows": "out.GenericBenchmark",
+            "out.GenericBenchmark.logs": "out.GenericBenchmark",
+            "out.GenericBenchmark.models": "out.GenericBenchmark",
+            "out.GenericBenchmark.results": "out.GenericBenchmark",
+            "out.GenericBenchmark.timings": "out.GenericBenchmark",
+            "out.GenericBenchmark.tmp": "out.GenericBenchmark",
+            "root": "/Users/zissou/repos/affe/note",
+            "sandbox": "root",
+            "tutorial": "root"
+        }
+    },
+    "visuals": {}
+}
