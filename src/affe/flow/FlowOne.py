@@ -12,12 +12,19 @@ class FlowOne(Flow):
         self.out_dp = out_dp
 
         # Ensure existence of your directories
-        self._log_dp.mkdir(parents=True, exist_ok=True)
-        self._flow_dp.mkdir(parents=True, exist_ok=True)
+        self.check_filesystem()
 
         super().__init__(
             log_filepath=str(self.log_fp), flow_filepath=str(self.flow_fp), **kwargs
         )
+        return
+
+    def check_filesystem(self):
+        """
+        Verify the existence of the directories in your filesystem.
+        """
+        self._log_dp.mkdir(parents=True, exist_ok=True)
+        self._flow_dp.mkdir(parents=True, exist_ok=True)
         return
 
     # Bookkeeping

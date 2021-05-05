@@ -1,6 +1,6 @@
 [SETTINGS] {
-  "date": "2021/05/05 22:09:01",
-  "date_iso": "2021-05-05T22:09:01.789337",
+  "date": "2021/05/05 22:14:48",
+  "date_iso": "2021-05-05T22:14:48.104045",
   "params": null,
   "system": {
     "nodename": "calypso.local",
@@ -11,39 +11,39 @@
     "system": "Darwin",
     "cpu_count": 8,
     "cpu_times": {
-      "user": 64145.31,
-      "system": 41131.77,
-      "idle": 1433718.02,
+      "user": 64276.01,
+      "system": 41220.64,
+      "idle": 1436269.04,
       "nice": 0.0
     },
-    "cpu_percent": 21.4,
+    "cpu_percent": 17.3,
     "virtual_memory": {
       "total": 17179869184,
-      "available": 1406914560,
+      "available": 1401143296,
       "percent": 91.8,
-      "used": 1860214784,
-      "free": 17539072
+      "used": 1827971072,
+      "free": 16084992
     }
   },
   "process": {
     "username": "zissou",
     "cwd": "/Users/zissou/repos/affe/note/tutorial",
-    "create_time": 1620245334.469866,
+    "create_time": 1620245681.271222,
     "cpu_times": {
-      "user": 0.026479036,
-      "system": 0.008578913
+      "user": 0.025957032,
+      "system": 0.008654008
     }
   },
   "logfile": "logfile",
   "max_time": 60.0,
   "function": {
-    "target": "functools.partial(<function hello_world at 0x7ff8f378ef70>, None)",
+    "target": "functools.partial(<function hello_world at 0x7fe27b846160>, None)",
     "args": []
   }
 }
 [INFO] Start: Run process
 [INFO] Write log to logfile.running.log
-[INFO] Finished: Run process 0.001 seconds
+[INFO] Finished: Run process 0.002 seconds
 [ERROR] Traceback (most recent call last):
   File "/Users/zissou/repos/affe/src/affe/dtaiexperimenter/process.py", line 247, in run
     result = self._run_execute()
