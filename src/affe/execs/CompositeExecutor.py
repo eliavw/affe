@@ -11,7 +11,7 @@ from .pinac import generate_nodefile
 try:
     from tqdm import tqdm
     from dask import distributed
-    from distributed import Client, Future
+    from distributed import Client, Future, progress
 except ImportError:
     Client = None
     Future = None
@@ -76,6 +76,8 @@ class CompositeExecutor(Executor):
             for i in range(self.n_child_workflows)
         ]
 
+def run_task(flow, executor, executor_options):
+    executor(flow, **executor_options).execute()
 
 class DaskExecutor(Executor):
     # I don't need the functionality from CompositeExecutor
@@ -88,20 +90,23 @@ class DaskExecutor(Executor):
 
     def execute(self, **executor_options):
         with Client(self.scheduler) as client:
-            futures = []
-            for flow in self.flows:
-                executor = self.executor(flow, **executor_options)
-                future = client.submit(executor.execute, executor, pure=False)
-                futures.append(future)
-            with tqdm(total=len(futures)) as pbar:
-                for future, _ in distributed.as_completed(
-                    futures, with_results=True, raise_errors=False
-                ):
-                    pbar.update(1)
-                    f: Future = future
-                    if f.exception() is not None:
-                        traceback.print_tb(f.traceback())
-                        print(f.exception())
+            futures = client.map(run_task, self.flows, pure = False, **executor_options)
+            progress(futures)
+            client.gather(futures)
+            # futures = []
+            # for flow in self.flows:
+            #     executor = self.executor(flow, **executor_options)
+            #     future = client.submit(executor.execute, executor, pure=False)
+            #     futures.append(future)
+            # with tqdm(total=len(futures)) as pbar:
+            #     for future, _ in distributed.as_completed(
+            #         futures, with_results=True, raise_errors=False
+            #     ):
+            #         pbar.update(1)
+            #         f: Future = future
+            #         if f.exception() is not None:
+            #             traceback.print_tb(f.traceback())
+            #             print(f.exception())
 
 
 class JoblibExecutor(CompositeExecutor):
