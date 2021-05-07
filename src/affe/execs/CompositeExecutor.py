@@ -12,6 +12,7 @@ try:
     from tqdm import tqdm
     from dask import distributed
     from distributed import Client, Future, progress
+    from tlz import partition_all
 except ImportError:
     Client = None
     Future = None
@@ -79,19 +80,31 @@ class CompositeExecutor(Executor):
 def run_task(flow, executor, executor_options):
     executor(flow, **executor_options).execute()
 
+def run_multiple_tasks(flows, executor, executor_options):
+    for flow in flows:
+        executor(flow, **executor_options).execute()
+
 class DaskExecutor(Executor):
     # I don't need the functionality from CompositeExecutor
     # I'm simply going to implement the execute method
-    def __init__(self, flows, executor, scheduler, show_progress=False):
+    def __init__(self, flows, executor, scheduler, show_progress=False, batch_size = None):
         self.flows = flows
         self.executor = executor
         self.scheduler = scheduler
         self.show_progress = show_progress
+        self.batch_size = batch_size
 
     def execute(self, **executor_options):
         with Client(self.scheduler) as client:
-            futures = client.map(run_task, self.flows, pure = False, **executor_options)
-            progress(futures)
+            if self.batch_size is not None:
+                # batch tasks together
+                batches = list(partition_all(self.batch_size, self.flows))
+                futures = client.map(run_multiple_tasks, batches, pure = False, **executor_options)
+            else:
+                # submit tasks individually
+                futures = client.map(run_task, self.flows, pure = False, **executor_options)
+            if self.show_progress:
+                progress(futures)
             client.gather(futures)
             # futures = []
             # for flow in self.flows:
