@@ -87,12 +87,13 @@ def run_multiple_tasks(flows, executor, **executor_options):
 class DaskExecutor(Executor):
     # I don't need the functionality from CompositeExecutor
     # I'm simply going to implement the execute method
-    def __init__(self, flows, executor, scheduler, show_progress=False, batch_size = None):
+    def __init__(self, flows, executor, scheduler, show_progress=False, batch_size = None, notebook = False):
         self.flows = flows
         self.executor = executor
         self.scheduler = scheduler
         self.show_progress = show_progress
         self.batch_size = batch_size
+        self.notebook = notebook
 
     def execute(self, **executor_options):
         with Client(self.scheduler) as client:
@@ -104,7 +105,7 @@ class DaskExecutor(Executor):
                 # submit tasks individually
                 futures = client.map(run_task, self.flows, pure = False,executor =  self.executor, **executor_options)
             if self.show_progress:
-                progress(futures)
+                progress(futures, notebook= self.notebook)
             client.gather(futures)
             # futures = []
             # for flow in self.flows:
