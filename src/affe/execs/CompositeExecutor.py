@@ -77,10 +77,10 @@ class CompositeExecutor(Executor):
             for i in range(self.n_child_workflows)
         ]
 
-def run_task(flow, executor, executor_options):
+def run_task(flow, executor, **executor_options):
     executor(flow, **executor_options).execute()
 
-def run_multiple_tasks(flows, executor, executor_options):
+def run_multiple_tasks(flows, executor, **executor_options):
     for flow in flows:
         executor(flow, **executor_options).execute()
 
@@ -99,10 +99,10 @@ class DaskExecutor(Executor):
             if self.batch_size is not None:
                 # batch tasks together
                 batches = list(partition_all(self.batch_size, self.flows))
-                futures = client.map(run_multiple_tasks, batches, pure = False, **executor_options)
+                futures = client.map(run_multiple_tasks, batches, pure = False,executor = self.executor, **executor_options)
             else:
                 # submit tasks individually
-                futures = client.map(run_task, self.flows, pure = False, **executor_options)
+                futures = client.map(run_task, self.flows, pure = False,executor =  self.executor, **executor_options)
             if self.show_progress:
                 progress(futures)
             client.gather(futures)
