@@ -1,10 +1,10 @@
 # affe
 
-AFFE is short for 
-**A**nother 
-**F**ramework 
-**F**or 
-**E**xperiments.
+AFFE is short for: 
+>>**A**nother  
+>>**F**ramework   
+>>**F**or   
+>>**E**xperiments.  
 
 There are _many_ experimental frameworks out there (hence the `A` in `AFFE`), but `AFFE` still got built because what we wanted to do did not really exist yet.
 
